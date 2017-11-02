@@ -39,8 +39,8 @@ class ServiceProviderRepository implements ServiceProviderRepositoryContract
      */
     public function find($id)
     {
-        $user = $this->serviceProvider->where('id', $id)->first();
-        return $user;
+        $serviceProvider = $this->serviceProvider->where('id', $id)->first();
+        return $serviceProvider;
     }
 
 

@@ -2,10 +2,10 @@
 
 namespace App\Contracts\Repositories;
 
-interface ServiceProviderRepository
+interface ServiceRepository
 {
     /**
-     * Get the service provider with the given ID.
+     * Get the service with the given ID.
      *
      * @param  int  $id
      * @return
@@ -13,7 +13,7 @@ interface ServiceProviderRepository
     public function find($id);
 
     /**
-     * Create a new service provider with the given data.
+     * Create a new service with the given data.
      *
      * @param  array  $data
      * @return
@@ -21,7 +21,7 @@ interface ServiceProviderRepository
     public function create(array $data);
 
     /**
-     * Updates a specific service provider with the given data
+     * Updates a specific service with the given data
      *
      * @param $id
      * @param array $data
@@ -30,7 +30,7 @@ interface ServiceProviderRepository
     public function update($id, array $data);
 
     /**
-     * Deletes a specific service provider
+     * Deletes a specific service
      *
      * @param $id
      * @return mixed
