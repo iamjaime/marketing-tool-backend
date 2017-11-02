@@ -15,7 +15,8 @@ class OrderRepository implements OrderRepositoryContract
      * @var array
      */
     public $create_rules = [
-        'name' => 'required'
+        'service_id' => 'required|exists:services,id',
+        'quantity' => 'required'
     ];
 
     /**
@@ -23,7 +24,8 @@ class OrderRepository implements OrderRepositoryContract
      * @var array
      */
     public $update_rules = [
-        'name' => 'sometimes|required'
+        'service_id' => 'sometimes|required|exists:services,id',
+        'quantity' => 'sometimes|required'
     ];
 
 
