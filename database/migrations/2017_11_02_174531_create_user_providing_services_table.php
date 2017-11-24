@@ -20,9 +20,13 @@ class CreateUserProvidingServicesTable extends Migration
             $table->integer('order_id')->unsigned();
             $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
 
-            //Foreign Key Referencing the id on the users table.
+            //Foreign Key Referencing the id on the user_attached_service_providers table.
+            //$table->integer('providing_service_user_id')->unsigned();
+            //$table->foreign('providing_service_user_id')->references('id')->on('users')->onDelete('cascade');
+
+            //Foreign Key Referencing the id on the user_attached_service_providers table.
             $table->integer('providing_service_user_id')->unsigned();
-            $table->foreign('providing_service_user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('providing_service_user_id')->references('id')->on('user_attached_service_providers')->onDelete('cascade');
 
             //Foreign Key Referencing the id on the users table.
             $table->integer('buying_service_user_id')->unsigned();

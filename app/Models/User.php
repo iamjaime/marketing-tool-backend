@@ -19,8 +19,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'provider', //Facebook, Youtube, Twitter Etc.
-        'provider_id'
+        'avatar'
     ];
 
     /**
