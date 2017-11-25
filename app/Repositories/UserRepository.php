@@ -74,9 +74,7 @@ class UserRepository implements UserRepositoryContract
         $this->user->forceFill([
             'name' => $data['name'],
             'email' => $data['email'],
-            'password' => bcrypt($data['password']),
-            'provider' => $data['provider'],
-            'provider_id' => $data['provider_id']
+            'password' => bcrypt($data['password'])
         ]);
 
         $this->user->save();
