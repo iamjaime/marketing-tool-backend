@@ -15,4 +15,13 @@ class Language extends Model
         'language_code',
         'language_label'
     ];
+
+    /**
+     * The attributes that should be hidden for arrays.
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'created_at', 'updated_at',
+    ];
 }

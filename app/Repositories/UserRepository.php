@@ -27,7 +27,13 @@ class UserRepository implements UserRepositoryContract
     public $update_rules = [
         'name' => 'sometimes|required',
         'email' => 'sometimes|required|email|unique:users,email',
-        'password'   => 'sometimes|required'
+        'password'   => 'sometimes|required',
+        'primary_language_id'   => 'sometimes|required|exists:languages,id',
+        'credits'   => 'sometimes|required',
+        'city' => 'sometimes|required',
+        'province' => 'sometimes|required',
+        'postal_code' => 'sometimes|required',
+        'country' => 'sometimes|required'
     ];
 
 
@@ -43,7 +49,7 @@ class UserRepository implements UserRepositoryContract
      */
     public function find($id)
     {
-        $user = $this->user->where('id', $id)->first();
+        $user = $this->user->where('id', $id)->with(['primaryLanguage', 'attachedNetworks.provider'])->first();
         return $user;
     }
 
@@ -55,7 +61,7 @@ class UserRepository implements UserRepositoryContract
      */
     public function findByEmail($email)
     {
-        $user = $this->user->where('email', $email)->first();
+        $user = $this->user->where('email', $email)->with(['primaryLanguage', 'attachedNetworks.provider'])->first();
         return $user;
     }
 
@@ -72,7 +78,8 @@ class UserRepository implements UserRepositoryContract
         $this->user->forceFill([
             'name' => $data['name'],
             'email' => $data['email'],
-            'password' => bcrypt($data['password'])
+            'password' => bcrypt($data['password']),
+            'primary_language_id' => 1 //default to English initially when the account is first created.
         ]);
 
         $this->user->save();
@@ -88,7 +95,7 @@ class UserRepository implements UserRepositoryContract
      */
     public function update($id, array $data)
     {
-        $user = $this->user->where('id', $id)->first();
+        $user = $this->user->where('id', $id)->with(['primaryLanguage', 'attachedNetworks.provider'])->first();
         if(!$user){
             return false;
         }

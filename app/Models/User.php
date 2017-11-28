@@ -35,4 +35,36 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+    /**
+     * Handles getting the user's primary language
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function primaryLanguage()
+    {
+        return $this->hasOne('App\Models\Language', 'id');
+    }
+
+    /**
+     * Handles getting the logged in user's attached social media networks
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function attachedNetworks()
+    {
+        return $this->hasMany('App\Models\UserAttachedServiceProvider', 'user_id');
+    }
+
+    /**
+     * Handles getting the orders that the logged in user has purchased.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function purchasedOrders()
+    {
+        return $this->hasMany('App\Models\Order', 'user_id');
+    }
+
+    
 }

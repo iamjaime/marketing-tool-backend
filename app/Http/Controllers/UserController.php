@@ -4,14 +4,17 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Repositories\UserRepository as User;
+use App\Repositories\UserAttachedServiceProviderRepository as UserAttachedServiceProvider;
 
 class UserController extends Controller
 {
     protected $user;
+    protected $userAttachedServiceProvider;
 
 
-    public function __construct(User $user){
+    public function __construct(User $user, UserAttachedServiceProvider $userAttachedServiceProvider){
         $this->user = $user;
+        $this->userAttachedServiceProvider = $userAttachedServiceProvider;
     }
 
     /**
@@ -140,5 +143,37 @@ class UserController extends Controller
             'success' => true
         ], 200);
     }
+
+
+    /**
+     * Handles attaching a user's account to a social media network provider.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function attachUserToServiceProvider(Request $request)
+    {
+        $data = $request->get('data');
+
+        //validate....
+        $rules = $this->userAttachedServiceProvider->create_rules;
+        $validator = $this->validate($request, $rules);
+
+        if(!empty($validator)){
+            return response()->json([
+                'success' => false,
+                'data' => $validator
+            ], 400);
+        }
+
+        //If we pass validation lets create and output success :)
+        $attachUserToServiceProvider = $this->userAttachedServiceProvider->create($this->userId(), $data);
+
+        return response()->json([
+            'success' => true,
+            'data' => $attachUserToServiceProvider
+        ], 201);
+    }
+
 
 }

@@ -24,6 +24,8 @@ class CreateUserAttachedServiceProvidersTable extends Migration
             $table->integer('provider_id')->unsigned();
             $table->foreign('provider_id')->references('id')->on('service_providers')->onDelete('cascade');
 
+            $table->string('provider_account_id'); //Example : Facebook's Account Id for this user.
+
             //In facebook this means "Friends" that a user has....
             //In Instagram this means "Followers" that a user has...
             $table->integer('traffic');
