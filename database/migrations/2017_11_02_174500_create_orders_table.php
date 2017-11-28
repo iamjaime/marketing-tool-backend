@@ -16,6 +16,10 @@ class CreateOrdersTable extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->increments('id');
 
+            //Foreign Key Referencing the id on the users table.
+            $table->integer('user_id')->unsigned();
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+
             //Foreign Key Referencing the id on the services table.
             $table->integer('service_id')->unsigned();
             $table->foreign('service_id')->references('id')->on('services')->onDelete('cascade');
@@ -23,8 +27,8 @@ class CreateOrdersTable extends Migration
             $table->integer('quantity');
             $table->boolean('is_complete')->default(false);
             $table->integer('progress')->default(0); //x of y quantity. ( 10 likes of 100 likes )
-            $table->decimal('total_cost', 16, 8);
-            $table->string('currency'); //BTC or ETH or LTC etc.
+            $table->string('total_cost'); //in credits
+
             $table->timestamps();
         });
     }

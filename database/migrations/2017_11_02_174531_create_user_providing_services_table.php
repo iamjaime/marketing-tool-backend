@@ -25,14 +25,12 @@ class CreateUserProvidingServicesTable extends Migration
             //$table->foreign('providing_service_user_id')->references('id')->on('users')->onDelete('cascade');
 
             //Foreign Key Referencing the id on the user_attached_service_providers table.
-            $table->integer('providing_service_user_id')->unsigned();
-            $table->foreign('providing_service_user_id')->references('id')->on('user_attached_service_providers')->onDelete('cascade');
+            $table->integer('providing_service_id')->unsigned();
+            $table->foreign('providing_service_id')->references('id')->on('user_attached_service_providers')->onDelete('cascade');
 
             //Foreign Key Referencing the id on the users table.
             $table->integer('buying_service_user_id')->unsigned();
             $table->foreign('buying_service_user_id')->references('id')->on('users')->onDelete('cascade');
-
-            $table->boolean('is_confirmed')->default(false);
 
             $table->timestamps();
         });

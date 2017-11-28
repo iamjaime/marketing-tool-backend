@@ -17,9 +17,7 @@ class UserRepository implements UserRepositoryContract
     public $create_rules = [
         'name' => 'required',
         'email' => 'required|email|unique:users,email',
-        'password'   => 'required',
-        'provider' => 'required',
-        'provider_id' => 'required'
+        'password'   => 'required'
     ];
 
     /**

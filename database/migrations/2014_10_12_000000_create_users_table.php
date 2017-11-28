@@ -20,6 +20,17 @@ class CreateUsersTable extends Migration
             $table->string('avatar')->nullable();
             $table->string('password', 60);
             $table->rememberToken();
+            $table->integer('credits')->default(0);
+
+            $table->string('city')->nullable();
+            $table->string('province')->nullable();
+            $table->string('postal_code')->nullable();
+            $table->string('country')->nullable();
+
+            //Foreign Key Referencing the id on the users table.
+            $table->integer('primary_language_id')->unsigned();
+            $table->foreign('primary_language_id')->references('id')->on('languages')->onDelete('cascade');
+
             $table->timestamps();
         });
     }
