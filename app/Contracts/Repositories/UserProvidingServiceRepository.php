@@ -15,10 +15,11 @@ interface UserProvidingServiceRepository
     /**
      * Create a new user providing service with the given data.
      *
+     * @param  integer  $user_id
      * @param  array  $data
      * @return
      */
-    public function create(array $data);
+    public function create($user_id, array $data);
 
     /**
      * Updates a specific user providing service with the given data

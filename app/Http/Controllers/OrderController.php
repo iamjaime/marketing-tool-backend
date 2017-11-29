@@ -4,13 +4,16 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Repositories\OrderRepository as Order;
+use App\Repositories\UserProvidingServiceRepository as UserProvidingService;
 
 class OrderController extends Controller
 {
     protected $order;
+    protected $userProvidingService;
     
-    public function __construct(Order $order){
+    public function __construct(Order $order, UserProvidingService $userProvidingService){
         $this->order = $order;
+        $this->userProvidingService = $userProvidingService;
     }
 
     /**
@@ -138,5 +141,35 @@ class OrderController extends Controller
         return response()->json([
             'success' => true
         ], 200);
+    }
+
+    /**
+     * Handles Filling an order
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function fill(Request $request)
+    {
+        $data = $request->get('data');
+
+        //validate....
+        $rules = $this->userProvidingService->create_rules;
+        $validator = $this->validate($request, $rules);
+
+        if(!empty($validator)){
+            return response()->json([
+                'success' => false,
+                'data' => $validator
+            ], 400);
+        }
+
+        //If we pass validation lets fill the order
+        $order = $this->userProvidingService->create($this->userId(), $data);
+
+        return response()->json([
+            'success' => true,
+            'data' => $order
+        ], 201);
     }
 }

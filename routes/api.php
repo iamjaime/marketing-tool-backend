@@ -41,6 +41,10 @@ Route::group(['prefix' => 'v1'], function () {
         Route::get('orders/service-provider/{id}', 'OrderController@providerOrders');
         Route::post('orders', 'OrderController@store');
 
+        //Handles filling the purchase order :)
+        Route::post('orders/fill', 'OrderController@fill');
+
+
     });
 
 });

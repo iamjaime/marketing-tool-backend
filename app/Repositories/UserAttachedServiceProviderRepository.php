@@ -48,6 +48,38 @@ class UserAttachedServiceProviderRepository implements UserAttachedServiceProvid
         return $userAttachedServiceProvider;
     }
 
+    /**
+     * Handles getting all of the attached social media service providers for the
+     * authenticated user.
+     *
+     * @param $user_id
+     * @return mixed
+     */
+    public function findAllByUserId($user_id)
+    {
+        $userAttachedServiceProviders = $this->userAttachedServiceProvider->where('user_id', $user_id)->get();
+        return $userAttachedServiceProviders;
+    }
+
+
+    /**
+     * Handles getting a specific service provider account for the authenticated user.
+     *
+     * @param $user_id
+     * @param $provider_id
+     * @param $provider_account_id
+     * @return mixed
+     */
+    public function findByUserIdAndProviderId($user_id, $provider_id, $provider_account_id)
+    {
+        $userAttachedServiceProviders = $this->userAttachedServiceProvider->where('user_id', $user_id)
+            ->where('provider_id', '=', $provider_id)
+            ->where('provider_account_id', '=', $provider_account_id)
+            ->first();
+        return $userAttachedServiceProviders;
+    }
+
+
 
     /**
      * Handles creating new user attached service provider

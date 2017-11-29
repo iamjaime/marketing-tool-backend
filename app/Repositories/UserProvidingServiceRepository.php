@@ -4,18 +4,28 @@ namespace App\Repositories;
 
 use App\Contracts\Repositories\UserProvidingServiceRepository as UserProvidingServiceRepositoryContract;
 use App\Models\UserProvidingService;
+use App\Models\Order;
+use App\Repositories\UserAttachedServiceProviderRepository as UserAttachedService;
+use App\Repositories\UserRepository as User;
+use Illuminate\Support\Facades\Config;
 
 class UserProvidingServiceRepository implements UserProvidingServiceRepositoryContract
 {
 
     protected $userProvidingService;
+    protected $order;
+    protected $userAttachedService;
+    protected $user;
+
 
     /**
      * Handles the create new user providing service validation rules.
      * @var array
      */
     public $create_rules = [
-        'name' => 'required'
+        'order_id' => 'required|exists:orders,id',
+        'provider_id' => 'required|exists:service_providers,id',
+        'provider_account_id' => 'required|exists:user_attached_service_providers,provider_account_id'
     ];
 
     /**
@@ -27,8 +37,11 @@ class UserProvidingServiceRepository implements UserProvidingServiceRepositoryCo
     ];
 
 
-    public function __construct(UserProvidingService $userProvidingService){
+    public function __construct(UserProvidingService $userProvidingService, Order $order, UserAttachedService $userAttachedService, User $user){
         $this->userProvidingService = $userProvidingService;
+        $this->order = $order;
+        $this->userAttachedService = $userAttachedService;
+        $this->user = $user;
     }
 
     /**
@@ -47,17 +60,65 @@ class UserProvidingServiceRepository implements UserProvidingServiceRepositoryCo
     /**
      * Handles creating new user providing service
      *
+     * @param integer $user_id  The authenticated user's id.
      * @param array $data
-     * @return UserProvidingService
+     * @return mixed
      */
-    public function create(array $data)
+    public function create($user_id, array $data)
     {
-        $this->userProvidingService = new UserProvidingService();
-        $this->userProvidingService->fill($data);
-        $this->userProvidingService->save();
+        $socialAccount = $this->userAttachedService->findByUserIdAndProviderId($user_id, $data['provider_id'], $data['provider_account_id']);
 
-        return $this->userProvidingService;
+        if(!$socialAccount){
+            return false;
+        }
+
+        $order = $this->order->where('id', '=', $data['order_id'])->first();
+
+        //get the amount of views that we need.
+        $remainingToFill = $this->getTrafficBalance($order);
+
+        //get the amount of traffic that we can fill with this social account.
+        $myTraffic = $socialAccount->traffic;
+
+        if($myTraffic >= $remainingToFill){
+            //we have enough traffic to fill the order....
+            $creditsInDollars = $remainingToFill * Config::get('marketingtool.net_worth');
+            $userCredits = $creditsInDollars * 100;
+
+            $systemCreditsInDollars = $remainingToFill * Config::get('marketingtool.system_commission');
+            $systemCredits = $systemCreditsInDollars * 100;
+
+            //now we can send ourselves the system commission
+            $this->user->addCredits(Config::get('marketingtool.admin_account_id'), $systemCredits);
+            $this->user->addCredits($user_id, $userCredits);
+
+            $this->userProvidingService = new UserProvidingService();
+            $this->userProvidingService->order_id = $order->id;
+            $this->userProvidingService->providing_service_id = $socialAccount->id;
+            $this->userProvidingService->buying_service_user_id = $order->user_id;
+            $this->userProvidingService->traffic_provided = $socialAccount->traffic;
+            $this->userProvidingService->credits_paid = $userCredits;
+            $this->userProvidingService->save();
+
+            return $this->userProvidingService;
+        }
+
+        return false;
     }
+
+
+    /**
+     * Handles getting the amount remaining to fill the order.
+     *
+     * @param $order
+     * @return mixed
+     */
+    private function getTrafficBalance($order)
+    {
+        $balance = $order->quantity - $order->progress;
+        return $balance;
+    }
+
 
     /**
      * Handles updating user providing service

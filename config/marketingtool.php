@@ -7,7 +7,6 @@
 return [
 
     'net_worth' => 0.01, //this means each social media account will be paid 1 cent for every "friend"/"follower" that they have.
-    'system_commission' => 0.01 //the system's commission per social media account's friend
-
-
+    'system_commission' => 0.01, //the system's commission per social media account's friend
+    'admin_account_id' => 1 //This is the administrator's id in the user's table (all commissions are sent here!)
 ];

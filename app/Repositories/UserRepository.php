@@ -108,13 +108,29 @@ class UserRepository implements UserRepositoryContract
     }
 
     /**
-     * Handles updating the user credits
+     * Handles add user credits
      *
      * @param $user_id
      * @param $credits
      * @return mixed
      */
-    public function updateCredits($user_id, $credits)
+    public function addCredits($user_id, $credits)
+    {
+        $user = $this->user->where('id', '=', $user_id)->first();
+        $user->credits = $credits;
+        $user->save();
+
+        return $user;
+    }
+
+    /**
+     * Handles deduct user credits
+     *
+     * @param $user_id
+     * @param $credits
+     * @return mixed
+     */
+    public function deductCredits($user_id, $credits)
     {
         $user = $this->user->where('id', '=', $user_id)->first();
         $user->credits = $credits;

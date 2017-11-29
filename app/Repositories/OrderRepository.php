@@ -6,12 +6,14 @@ use App\Contracts\Repositories\OrderRepository as OrderRepositoryContract;
 use App\Models\Order;
 use Illuminate\Support\Facades\Config;
 use App\Models\ServiceProvider;
+use App\Repositories\UserRepository as User;
 
 class OrderRepository implements OrderRepositoryContract
 {
 
     protected $order;
     protected $serviceProvider;
+    protected $user;
 
     /**
      * Handles the create new order validation rules.
@@ -35,9 +37,10 @@ class OrderRepository implements OrderRepositoryContract
     ];
 
 
-    public function __construct(Order $order, ServiceProvider $serviceProvider){
+    public function __construct(Order $order, ServiceProvider $serviceProvider, User $user){
         $this->order = $order;
         $this->serviceProvider = $serviceProvider;
+        $this->user = $user;
     }
 
     /**
@@ -93,6 +96,9 @@ class OrderRepository implements OrderRepositoryContract
         $costInCredits = $costInDollars * 100;
 
         $this->order->total_cost = $costInCredits;
+
+        //now lets deduct the total cost from the purchaser's account....
+        $this->user->deductCredits($user_id, $costInCredits);
 
         $this->order->save();
 
