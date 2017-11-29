@@ -32,6 +32,9 @@ class CreateUserProvidingServicesTable extends Migration
             $table->integer('buying_service_user_id')->unsigned();
             $table->foreign('buying_service_user_id')->references('id')->on('users')->onDelete('cascade');
 
+            $table->integer('traffic_provided'); //the amount of views that are being provided by this person.
+            $table->integer('credits_paid'); //the amount of credits that this user was paid for this service.
+
             $table->timestamps();
         });
     }

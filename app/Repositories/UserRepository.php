@@ -29,7 +29,6 @@ class UserRepository implements UserRepositoryContract
         'email' => 'sometimes|required|email|unique:users,email',
         'password'   => 'sometimes|required',
         'primary_language_id'   => 'sometimes|required|exists:languages,id',
-        'credits'   => 'sometimes|required',
         'city' => 'sometimes|required',
         'province' => 'sometimes|required',
         'postal_code' => 'sometimes|required',
@@ -107,6 +106,23 @@ class UserRepository implements UserRepositoryContract
 
         return $user;
     }
+
+    /**
+     * Handles updating the user credits
+     *
+     * @param $user_id
+     * @param $credits
+     * @return mixed
+     */
+    public function updateCredits($user_id, $credits)
+    {
+        $user = $this->user->where('id', '=', $user_id)->first();
+        $user->credits = $credits;
+        $user->save();
+
+        return $user;
+    }
+
 
     /**
      * Handles Deleting User

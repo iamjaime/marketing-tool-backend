@@ -14,10 +14,40 @@ class Order extends Model
     protected $fillable = [
         'quantity',
         'is_complete',
-        'progress',
-        'total_cost',
-        'currency'
+        'progress'
     ];
+
+    /**
+     * The attributes that should be hidden for arrays.
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'user_id',
+        'service_id',
+        'service_provider_id'
+    ];
+
+    /**
+     * Handles Getting the Buyer details
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function buyer()
+    {
+        return $this->hasOne('App\Models\User', 'id');
+    }
+
+
+    /**
+     * Handles getting the social media network (example : Facebook, Instagram etc.)
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function provider()
+    {
+        return $this->hasOne('App\Models\ServiceProvider', 'id', 'service_provider_id');
+    }
 
     /**
      * Handles getting the service that the User has purchased.
@@ -25,7 +55,7 @@ class Order extends Model
      */
     public function service()
     {
-        return $this->hasOne('App\Models\Service');
+        return $this->hasOne('App\Models\Service', 'id', 'service_id');
     }
 
     /**

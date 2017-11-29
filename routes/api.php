@@ -35,6 +35,12 @@ Route::group(['prefix' => 'v1'], function () {
         Route::delete('users/{id}', 'UserController@destroy');
 
         Route::post('users/attach_to_service_provider', 'UserController@attachUserToServiceProvider');
+
+
+        //Order Resource
+        Route::get('orders/service-provider/{id}', 'OrderController@providerOrders');
+        Route::post('orders', 'OrderController@store');
+
     });
 
 });

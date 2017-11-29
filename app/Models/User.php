@@ -20,7 +20,6 @@ class User extends Authenticatable
         'email',
         'password',
         'avatar',
-        'credits',
         'city',
         'province',
         'postal_code',

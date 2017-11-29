@@ -16,6 +16,17 @@ class Service extends Model
     ];
 
     /**
+     * The attributes that should be hidden for arrays.
+     *
+     * @var array
+     */
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+        'service_provider_id'
+    ];
+
+    /**
      * Handles getting the service provider that this service is for.
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */

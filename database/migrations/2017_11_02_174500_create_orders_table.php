@@ -20,6 +20,10 @@ class CreateOrdersTable extends Migration
             $table->integer('user_id')->unsigned();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
 
+            //Foreign Key Referencing the id on the service_providers table.
+            $table->integer('service_provider_id')->unsigned();
+            $table->foreign('service_provider_id')->references('id')->on('service_providers')->onDelete('cascade');
+
             //Foreign Key Referencing the id on the services table.
             $table->integer('service_id')->unsigned();
             $table->foreign('service_id')->references('id')->on('services')->onDelete('cascade');
