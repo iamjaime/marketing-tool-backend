@@ -33,6 +33,8 @@ class CreateOrdersTable extends Migration
             $table->integer('progress')->default(0); //x of y quantity. ( 10 likes of 100 likes )
             $table->string('total_cost'); //in credits
 
+            $table->string('url'); //the URL of the order that we are advertising (example: facebook post url, or youtube video url)
+
             $table->timestamps();
         });
     }

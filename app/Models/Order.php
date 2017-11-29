@@ -14,7 +14,8 @@ class Order extends Model
     protected $fillable = [
         'quantity',
         'is_complete',
-        'progress'
+        'progress',
+        'url'
     ];
 
     /**
