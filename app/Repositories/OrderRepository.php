@@ -86,24 +86,38 @@ class OrderRepository implements OrderRepositoryContract
      */
     public function create($user_id, array $data)
     {
+        $costInCredits = $this->getCreditsNeeded($data['quantity']);
+
+        //now lets deduct the total cost from the purchaser's account....
+        $this->user->deductCredits($user_id, $costInCredits);
+
         $this->order = new Order();
         $this->order->fill($data);
         $this->order->user_id = $user_id;
         $this->order->service_provider_id = $data['service_provider_id'];
         $this->order->service_id = $data['service_id'];
 
-        $costInDollars = $data['quantity'] * (Config::get('marketingtool.net_worth') + Config::get('marketingtool.system_commission'));
-        $costInCredits = $costInDollars * 100;
-
         $this->order->total_cost = $costInCredits;
-
-        //now lets deduct the total cost from the purchaser's account....
-        $this->user->deductCredits($user_id, $costInCredits);
 
         $this->order->save();
 
         return $this->order;
     }
+
+    /**
+     * Handles getting the credits needed
+     *
+     * @param $quantity
+     * @return mixed
+     */
+    public function getCreditsNeeded($quantity)
+    {
+        $costInDollars = $quantity * (Config::get('marketingtool.net_worth') + Config::get('marketingtool.system_commission'));
+        $costInCredits = $costInDollars * 100;
+
+        return $costInCredits;
+    }
+
 
     /**
      * Handles updating order

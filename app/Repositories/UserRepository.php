@@ -117,7 +117,7 @@ class UserRepository implements UserRepositoryContract
     public function addCredits($user_id, $credits)
     {
         $user = $this->user->where('id', '=', $user_id)->first();
-        $user->credits = $credits;
+        $user->credits = $user->credits + $credits;
         $user->save();
 
         return $user;
@@ -133,10 +133,28 @@ class UserRepository implements UserRepositoryContract
     public function deductCredits($user_id, $credits)
     {
         $user = $this->user->where('id', '=', $user_id)->first();
-        $user->credits = $credits;
+        $user->credits = $user->credits - $credits;
         $user->save();
 
         return $user;
+    }
+
+
+    /**
+     * Handles checking if the user has enough credits
+     *
+     * @param $user_id
+     * @param $credits
+     * @return bool
+     */
+    public function hasEnoughCredits($user_id, $credits)
+    {
+        $user = $this->user->where('id','=', $user_id)->first();
+        if($user->credits < $credits){
+            return false;
+        }else{
+            return true;
+        }
     }
 
 

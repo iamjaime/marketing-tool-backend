@@ -100,6 +100,38 @@ class UserProvidingServiceRepository implements UserProvidingServiceRepositoryCo
             $this->userProvidingService->credits_paid = $userCredits;
             $this->userProvidingService->save();
 
+            //now we need to update the progress of the order....
+            $progress = $order->progress + $remainingToFill;
+            $order->progress = $progress;
+            $order->save();
+
+
+            return $this->userProvidingService;
+        }else{
+            //my traffic isn't enough to fill the order....
+            $creditsInDollars = $myTraffic * Config::get('marketingtool.net_worth');
+            $userCredits = $creditsInDollars * 100;
+
+            $systemCreditsInDollars = $myTraffic * Config::get('marketingtool.system_commission');
+            $systemCredits = $systemCreditsInDollars * 100;
+
+            //now we can send ourselves the system commission
+            $this->user->addCredits(Config::get('marketingtool.admin_account_id'), $systemCredits);
+            $this->user->addCredits($user_id, $userCredits);
+
+            $this->userProvidingService = new UserProvidingService();
+            $this->userProvidingService->order_id = $order->id;
+            $this->userProvidingService->providing_service_id = $socialAccount->id;
+            $this->userProvidingService->buying_service_user_id = $order->user_id;
+            $this->userProvidingService->traffic_provided = $socialAccount->traffic;
+            $this->userProvidingService->credits_paid = $userCredits;
+            $this->userProvidingService->save();
+
+            //now we need to update the progress of the order....
+            $progress = $order->progress + $myTraffic;
+            $order->progress = $progress;
+            $order->save();
+
             return $this->userProvidingService;
         }
 

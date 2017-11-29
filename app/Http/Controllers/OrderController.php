@@ -5,15 +5,18 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Repositories\OrderRepository as Order;
 use App\Repositories\UserProvidingServiceRepository as UserProvidingService;
+use App\Repositories\UserRepository as User;
 
 class OrderController extends Controller
 {
     protected $order;
     protected $userProvidingService;
+    protected $user;
     
-    public function __construct(Order $order, UserProvidingService $userProvidingService){
+    public function __construct(Order $order, UserProvidingService $userProvidingService, User $user){
         $this->order = $order;
         $this->userProvidingService = $userProvidingService;
+        $this->user = $user;
     }
 
     /**
@@ -59,6 +62,16 @@ class OrderController extends Controller
             return response()->json([
                 'success' => false,
                 'data' => $validator
+            ], 400);
+        }
+
+        $credits = $this->order->getCreditsNeeded($data['quantity']);
+        if(!$this->user->hasEnoughCredits($this->userId(), $credits)){
+            return response()->json([
+                'success' => false,
+                'data' => [
+                    "credits" => ['You do not have enough credits to make this order.']
+                ]
             ], 400);
         }
 
