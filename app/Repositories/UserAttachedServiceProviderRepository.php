@@ -94,7 +94,11 @@ class UserAttachedServiceProviderRepository implements UserAttachedServiceProvid
         $this->userAttachedServiceProvider->fill($data);
         $this->userAttachedServiceProvider->user_id = $user_id;
         $this->userAttachedServiceProvider->provider_id = $data['provider_id'];
-        $this->userAttachedServiceProvider->net_worth = $data['traffic'] / Config::get('marketingtool.net_worth');
+
+        $netWorthInDollars = $data['traffic'] * Config::get('marketingtool.net_worth');
+        $netWorthInCredits = $netWorthInDollars * 100;
+
+        $this->userAttachedServiceProvider->net_worth = $netWorthInCredits;
         $this->userAttachedServiceProvider->save();
 
         return $this->userAttachedServiceProvider;
@@ -118,7 +122,12 @@ class UserAttachedServiceProviderRepository implements UserAttachedServiceProvid
             return false;
         }
         $userAttachedServiceProvider->fill($data);
-        $this->userAttachedServiceProvider->net_worth = $data['traffic'] / Config::get('net_worth');
+
+        $netWorthInDollars = $data['traffic'] * Config::get('marketingtool.net_worth');
+        $netWorthInCredits = $netWorthInDollars * 100;
+
+        $this->userAttachedServiceProvider->net_worth = $netWorthInCredits;
+
         $userAttachedServiceProvider->save();
 
         return $userAttachedServiceProvider;
