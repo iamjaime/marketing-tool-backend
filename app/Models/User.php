@@ -42,7 +42,7 @@ class User extends Authenticatable
      */
     public function primaryLanguage()
     {
-        return $this->hasOne('App\Models\Language', 'id');
+        return $this->hasOne('App\Models\Language', 'id', 'primary_language_id');
     }
 
     /**

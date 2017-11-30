@@ -32,6 +32,6 @@ class UserAttachedServiceProvider extends Model
      */
     public function provider()
     {
-        return $this->hasOne('App\Models\ServiceProvider', 'id');
+        return $this->hasOne('App\Models\ServiceProvider', 'id', 'provider_id');
     }
 }
