@@ -76,6 +76,30 @@ class OrderRepository implements OrderRepositoryContract
         return $orders;
     }
 
+    /**
+     * Handles Finding all orders from a specific service provider
+     * That belong to a specific user
+     *
+     * @param Integer $providerId
+     * @param Integer $buyerId
+     * @param Boolean $isCompleted
+     * @return mixed
+     */
+    public function findAllByProviderIdAndBuyerId($providerId, $buyerId, $isCompleted=false)
+    {
+        $orders = $this->serviceProvider->where('id', '=', $providerId)
+            ->with(['orders' => function($q) use ($isCompleted, $buyerId){
+            $q->where('is_complete', '=', $isCompleted)->where('user_id', '=', $buyerId);
+        },
+                'orders.usersProvidingService',
+                'orders.service',
+                'orders.buyer'
+            ])->get();
+
+        return $orders;
+    }
+
+
 
     /**
      * Handles creating new order

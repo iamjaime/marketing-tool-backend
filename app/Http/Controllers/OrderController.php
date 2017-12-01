@@ -33,6 +33,20 @@ class OrderController extends Controller
         ], 200);
     }
 
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function ownedOrders($providerId)
+    {
+        $order = $this->order->findAllByProviderIdAndBuyerId($providerId, $this->userId(), false);
+        return response()->json([
+            'success' => true,
+            'data' => $order
+        ], 200);
+    }
+
 
     /**
      * Show the form for creating a new resource.
