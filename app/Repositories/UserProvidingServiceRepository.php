@@ -103,6 +103,7 @@ class UserProvidingServiceRepository implements UserProvidingServiceRepositoryCo
             //now we need to update the progress of the order....
             $progress = $order->progress + $remainingToFill;
             $order->progress = $progress;
+            $order->is_complete = true;
             $order->save();
 
 
@@ -130,6 +131,11 @@ class UserProvidingServiceRepository implements UserProvidingServiceRepositoryCo
             //now we need to update the progress of the order....
             $progress = $order->progress + $myTraffic;
             $order->progress = $progress;
+
+            if($progress >= $order->quantity){
+                $order->is_complete = true;
+            }
+
             $order->save();
 
             return $this->userProvidingService;
