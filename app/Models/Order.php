@@ -36,7 +36,7 @@ class Order extends Model
      */
     public function buyer()
     {
-        return $this->hasOne('App\Models\User', 'id');
+        return $this->hasOne('App\Models\User', 'id', 'user_id');
     }
 
 
