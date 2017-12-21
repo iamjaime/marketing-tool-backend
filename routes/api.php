@@ -31,7 +31,7 @@ Route::group(['prefix' => 'v1'], function () {
         //User Resource
         Route::get('users', 'UserController@index');
         Route::get('users/{id}', 'UserController@show');
-        Route::put('users/{id}', 'UserController@update');
+        Route::put('users', 'UserController@update'); //Updates the user that is logged in.
         Route::delete('users/{id}', 'UserController@destroy');
 
         Route::post('users/attach_to_service_provider', 'UserController@attachUserToServiceProvider');

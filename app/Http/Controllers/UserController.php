@@ -103,10 +103,9 @@ class UserController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
         $data = $request->get('data');
 
@@ -122,7 +121,7 @@ class UserController extends Controller
         }
 
         //If we pass validation lets update user and output success :)
-        $user = $this->user->update($id, $data);
+        $user = $this->user->update($this->userId(), $data);
 
         return response()->json([
             'success' => true,
