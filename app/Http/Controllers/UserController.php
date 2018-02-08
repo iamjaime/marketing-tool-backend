@@ -6,8 +6,20 @@ use Illuminate\Http\Request;
 use App\Repositories\UserRepository as User;
 use App\Repositories\UserAttachedServiceProviderRepository as UserAttachedServiceProvider;
 
+//forgot password
+use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
+
+
+//Mailer....
+use Illuminate\Support\Facades\Mail;
+use App\Mail\UserSignup;
+
+
+
 class UserController extends Controller
 {
+
+
     protected $user;
     protected $userAttachedServiceProvider;
 
@@ -63,8 +75,10 @@ class UserController extends Controller
             ], 400);
         }
 
+
         //If we pass validation lets create user and output success :)
         $user = $this->user->create($data);
+        Mail::to($user->email)->send(new UserSignup($user));
 
         return response()->json([
             'success' => true,
