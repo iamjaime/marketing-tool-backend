@@ -62,6 +62,19 @@ class ResetPasswordController extends Controller
         return $data;
     }
 
+    /**
+     * Get the password reset validation rules.
+     *
+     * @return array
+     */
+    protected function rules()
+    {
+        return [
+            'token' => 'required|exists:password_resets,token',
+            'email' => 'required|email',
+            'password' => 'required|confirmed|min:6',
+        ];
+    }
 
     /**
      * Reset the given user's password.
@@ -71,9 +84,20 @@ class ResetPasswordController extends Controller
      */
     public function reset(Request $request)
     {
-        $this->validate($request, $this->rules(), $this->validationErrorMessages());
-
         $data = $this->credentials($request);
+
+        //validate....
+        $rules = $this->rules();
+        $validator = $this->validate($request, $rules);
+
+        if(!empty($validator)){
+            return response()->json([
+                'success' => false,
+                'data' => $validator
+            ], 400);
+        }
+
+        //$this->validate($request, $this->rules(), $this->validationErrorMessages());
 
         $user = User::where('email', $data['email'])->first();
         $user->password = Hash::make($data['password']);
