@@ -36,7 +36,6 @@ Route::group(['prefix' => 'v1'], function () {
 
         Route::post('users/attach_to_service_provider', 'UserController@attachUserToServiceProvider');
 
-
         //Order Resource
         Route::get('orders/service-provider/{id}', 'OrderController@providerOrders');
         Route::get('orders/service-provider/{id}/owned', 'OrderController@ownedOrders');

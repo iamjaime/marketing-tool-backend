@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Contracts\Repositories\UserRepository as UserRepositoryContract;
 use App\Models\User;
 
+
 class UserRepository implements UserRepositoryContract
 {
 
