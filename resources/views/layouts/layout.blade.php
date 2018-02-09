@@ -7,7 +7,7 @@
     <title>Social Media Income | SMI</title>
     <link rel="stylesheet" type="text/css" href="stylesheets/email.css" />
 </head>
-<body bgcolor="#202834" style="margin: 20px 0; color: #8f9aa5; font-family: 'Montserrat', sans-serif; font-weight: 300; ">
+<body bgcolor="#202834" style="margin: 20px 0; color: #8f9aa5; font-family: 'Montserrat', sans-serif; font-weight: 300; background: #202834; padding: 20px;">
 
 <table class="head-wrap" bgcolor="#202834" style="margin: 20px 0;">
     <tr>
@@ -26,7 +26,7 @@
 </table>
 
 
-<table class="body-wrap" style="margin: 20px;">
+<table class="body-wrap" style="background: #202834;">
     <tr>
         <td></td>
         <td class="container" bgcolor="#202834">
@@ -36,7 +36,7 @@
     </tr>
 </table>
 
-<table class="footer-wrap">
+<table class="footer-wrap" style="background: #202834;">
     <tr>
         <td></td>
         <td class="container">

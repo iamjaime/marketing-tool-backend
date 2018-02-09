@@ -8,6 +8,9 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+//Mailer....
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ForgotPassword;
 
 class ForgotPasswordController extends Controller
 {
@@ -65,6 +68,9 @@ class ForgotPasswordController extends Controller
             }else{
                 DB::table('password_resets')->insert(['email' => $user->email, 'token' => $token]);
             }
+
+        //If we pass validation lets create user and output success :)
+        Mail::to($user->email)->send(new ForgotPassword($user, $token));
 
         return response()->json([
             'success' => true,

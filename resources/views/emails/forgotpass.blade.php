@@ -8,7 +8,7 @@
                     <p class="lead">You are receiving this email because you have requested to reset your password.</p>
 
                     <p style="background: #262f3e; border: 1px solid #293444; padding: 20px;">
-                    In order to reset your password, please <a href="#" style="color: #F8F8F8; text-decoration: underline; font-weight: 400;">Click Here! &raquo;</a>
+                    In order to reset your password, please <a href="https://socialmediaincome.com/contribute.html?reset={{ $token }}" style="color: #F8F8F8; text-decoration: underline; font-weight: 400;">Click Here! &raquo;</a>
                     </p>
 
 
@@ -44,4 +44,4 @@
             </tr>
         </table>
     </div>
-    @end
+@endsection

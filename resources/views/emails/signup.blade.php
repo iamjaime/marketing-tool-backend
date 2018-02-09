@@ -12,6 +12,10 @@
                         {{--Phasellus dictum sapien a neque luctus cursus. Pellentesque sem dolor, fringilla et pharetra vitae. <a href="#" style="color: #F8F8F8; text-decoration: underline; font-weight: 400;">Click it! &raquo;</a>--}}
                     {{--</p>--}}
 
+                    <p>We really appreciate your interest in SMI and will do our best to make it worth your while!</p>
+                    <p>&nbsp;</p>
+                    <p>&nbsp;</p>
+                    <p>Sincerely, <br> Social Media Income Team</p>
 
                     <table class="social" style="border-top: 1px solid rgba(120, 130, 140, 0.13); margin-top: 40px;" width="100%">
                         <tr>
@@ -45,4 +49,4 @@
             </tr>
         </table>
     </div>
-@end
+@endsection
