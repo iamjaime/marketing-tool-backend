@@ -26,8 +26,8 @@
                                         <td>
                                             <h5 class="">Connect with Us:</h5>
                                             <p class="">
-                                                <a href="#" class="soc-btn fb"><img src="https://s3.amazonaws.com/socialmediaincome.com/images/fb-icon.png" alt="Social Media Income Facebook" width="50"></a>
-                                                <a href="#" class="soc-btn tw"><img src="https://s3.amazonaws.com/socialmediaincome.com/images/twitter-icon.png" alt="Social Media Income Twitter" width="50"></a>
+                                                <a href="https://www.facebook.com/smicoin" class="soc-btn fb"><img src="https://s3.amazonaws.com/socialmediaincome.com/images/fb-icon.png" alt="Social Media Income Facebook" width="50"></a>
+                                                <a href="https://twitter.com/smicoin" class="soc-btn tw"><img src="https://s3.amazonaws.com/socialmediaincome.com/images/twitter-icon.png" alt="Social Media Income Twitter" width="50"></a>
                                             </p>
                                         </td>
                                     </tr>
