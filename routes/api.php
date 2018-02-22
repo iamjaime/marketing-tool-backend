@@ -20,6 +20,11 @@ Route::group(['prefix' => 'v1'], function () {
     //User Registration - UnAuthenticated Endpoint
     Route::post('users', 'UserController@store');
 
+
+    //The SMI Pool - UnAuthenticated Endpoint
+    Route::get('smi/pool', 'OrderController@pool');
+
+
     //Reset Password
     Route::post('password/email', 'Auth\ForgotPasswordController@getResetToken');
     Route::post('password/reset', 'Auth\ResetPasswordController@reset');

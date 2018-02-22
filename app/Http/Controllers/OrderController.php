@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Repositories\OrderRepository as Order;
 use App\Repositories\UserProvidingServiceRepository as UserProvidingService;
 use App\Repositories\UserRepository as User;
+use Illuminate\Support\Facades\Config;
 
 class OrderController extends Controller
 {
@@ -198,5 +199,22 @@ class OrderController extends Controller
             'success' => true,
             'data' => $order
         ], 201);
+    }
+
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function pool()
+    {
+        $user = $this->user->findByEmail(env('MARKETING_TOOL_ADMIN_EMAIL'));
+        $pool = $user->credits * Config::get('marketingtool.smi_pool');
+
+        return response()->json([
+            'success' => true,
+            'data' => round($pool, 0, PHP_ROUND_HALF_DOWN)
+        ], 200);
     }
 }
