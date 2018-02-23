@@ -39,6 +39,30 @@ class OrderController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function personalProviderOrders($providerId, $providerAccountId)
+    {
+        $order = $this->order->findAllByProviderIdAndFillerId($providerId, $providerAccountId, $this->userId(), false);
+
+        if(!$order){
+            return response()->json([
+                'success' => false,
+                'data' => [
+                    "account" => ['There is no record of the account provided.']
+                ]
+            ], 400);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $order
+        ], 200);
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function ownedOrders($providerId)
     {
         $order = $this->order->findAllByProviderIdAndBuyerId($providerId, $this->userId(), false);

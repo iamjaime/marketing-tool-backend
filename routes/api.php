@@ -43,6 +43,12 @@ Route::group(['prefix' => 'v1'], function () {
 
         //Order Resource
         Route::get('orders/service-provider/{id}', 'OrderController@providerOrders');
+
+        //Handles getting all of the orders that a user can fill
+        //This is for limited jobs....meaning that if an order was filled by this user within X amount of time, it returns only the orders
+        //that are able to be filled at the current time EXCLUDING the orders that were already filled and need to wait for the waiting period to pass.
+        Route::get('orders/service-provider/{id}/personal/{providerAccountId}', 'OrderController@personalProviderOrders');
+
         Route::get('orders/service-provider/{id}/owned', 'OrderController@ownedOrders');
         Route::post('orders', 'OrderController@store');
 

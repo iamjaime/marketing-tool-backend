@@ -7,6 +7,10 @@ use App\Models\Order;
 use Illuminate\Support\Facades\Config;
 use App\Models\ServiceProvider;
 use App\Repositories\UserRepository as User;
+use App\Repositories\UserAttachedServiceProviderRepository as UserAttachedServiceProvider;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use App\Models\UserProvidingService;
 
 class OrderRepository implements OrderRepositoryContract
 {
@@ -14,6 +18,8 @@ class OrderRepository implements OrderRepositoryContract
     protected $order;
     protected $serviceProvider;
     protected $user;
+    protected $userAttachedServiceProvider;
+    protected $userProvidingService;
 
     /**
      * Handles the create new order validation rules.
@@ -37,10 +43,12 @@ class OrderRepository implements OrderRepositoryContract
     ];
 
 
-    public function __construct(Order $order, ServiceProvider $serviceProvider, User $user){
+    public function __construct(Order $order, ServiceProvider $serviceProvider, User $user, UserAttachedServiceProvider $userAttachedServiceProviderRepository, UserProvidingService $userProvidingService){
         $this->order = $order;
         $this->serviceProvider = $serviceProvider;
         $this->user = $user;
+        $this->userAttachedServiceProvider = $userAttachedServiceProviderRepository;
+        $this->userProvidingService = $userProvidingService;
     }
 
     /**
@@ -98,6 +106,66 @@ class OrderRepository implements OrderRepositoryContract
 
         return $orders;
     }
+
+    /**
+     * Handles Finding all orders from a specific service provider
+     * That have been filled by a specific user
+     *
+     * @param Integer $providerId
+     * @param Integer $providerAccountId
+     * @param Integer $fillerId
+     * @param Boolean $isCompleted
+     * @return mixed
+     */
+    public function findAllByProviderIdAndFillerId($providerId, $providerAccountId, $fillerId, $isCompleted=false)
+    {
+        $orders_that_were_filled = $this->getFilledOrders(Config::get('marketingtool.job_limit_per_hour'), $fillerId, $providerId, $providerAccountId);
+
+        if($orders_that_were_filled){
+            $orders = $this->order->where('is_complete', '=', $isCompleted)->whereNotIn('id', $orders_that_were_filled)->get();
+        }else{
+            $orders = $this->order->where('is_complete', '=', $isCompleted)->get();
+        }
+
+        return $orders;
+    }
+
+
+    /**
+     * Handles getting the orders that have already been filled by a specific user.
+     *
+     * @param $hoursOffset          How many hours prior was the order filled?
+     * @param $userId               The user who filled the order
+     * @param $providerId           The provider id ( facebook, twitter, instagram etc. )
+     * @param $providerAccountId    The provider account id.
+     * @return mixed
+     */
+    protected function getFilledOrders($hoursOffset, $userId, $providerId, $providerAccountId)
+    {
+        $accountProvidingService = $this->userAttachedServiceProvider->findByUserIdAndProviderId($userId, $providerId, $providerAccountId);
+        if(!$accountProvidingService){
+            return false;
+        }
+        $userProvidingServiceId = $accountProvidingService->id;
+
+        $ordersArray = [];
+
+        //SELECT * FROM user_providing_services as ups where created_at < timestampadd(hour, -12, now());
+        $ordersAlreadyFilled = $this->userProvidingService
+            ->where('created_at', '>', Carbon::now()->subHours($hoursOffset))
+            ->where('providing_service_id', '=', $userProvidingServiceId)
+            ->select('user_providing_services.order_id')
+            ->get();
+
+        foreach($ordersAlreadyFilled as $order) {
+            if(!in_array($order->order_id, $ordersArray)){
+                array_push($ordersArray, $order->order_id);
+            }
+        }
+
+        return $ordersArray;
+    }
+
 
 
 
