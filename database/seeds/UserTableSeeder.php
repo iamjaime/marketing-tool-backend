@@ -22,5 +22,15 @@ class UserTableSeeder extends Seeder
 
         $usr = new User();
         $usr->create($user);
+
+        $user = [
+            'name' => 'pool',
+            'email' => Config::get('marketingtool.pool_email'),
+            'password' => bcrypt(Config::get('marketingtool.admin_password')),
+            'primary_language_id' => 1 //default english
+        ];
+
+        $usr = new User();
+        $usr->create($user);
     }
 }

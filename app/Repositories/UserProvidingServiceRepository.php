@@ -85,12 +85,23 @@ class UserProvidingServiceRepository implements UserProvidingServiceRepositoryCo
             $creditsInDollars = $remainingToFill * Config::get('marketingtool.net_worth');
             $userCredits = $creditsInDollars * 100;
 
+
             $systemCreditsInDollars = $remainingToFill * Config::get('marketingtool.system_commission');
             $systemCredits = $systemCreditsInDollars * 100;
 
+
+            //Lets get the pool credits from the system credits.....
+            $poolCredits = $systemCredits * Config::get('marketingtool.smi_pool');
+
+
+            //deduct from system credits and append to pool credits
+            $systemCredits = $systemCredits - $poolCredits;
+
             //now we can send ourselves the system commission
             $this->user->addCredits(Config::get('marketingtool.admin_account_id'), $systemCredits);
+            $this->user->addCredits(Config::get('marketingtool.smi_pool_account_id'), $poolCredits);
             $this->user->addCredits($user_id, $userCredits);
+
 
             $this->userProvidingService = new UserProvidingService();
             $this->userProvidingService->order_id = $order->id;
@@ -116,8 +127,16 @@ class UserProvidingServiceRepository implements UserProvidingServiceRepositoryCo
             $systemCreditsInDollars = $myTraffic * Config::get('marketingtool.system_commission');
             $systemCredits = $systemCreditsInDollars * 100;
 
+            //Lets get the pool credits from the system credits.....
+            $poolCredits = $systemCredits * Config::get('marketingtool.smi_pool');
+
+            //deduct from system credits and append to pool credits
+            $systemCredits = $systemCredits - $poolCredits;
+
+
             //now we can send ourselves the system commission
             $this->user->addCredits(Config::get('marketingtool.admin_account_id'), $systemCredits);
+            $this->user->addCredits(Config::get('marketingtool.smi_pool_account_id'), $poolCredits);
             $this->user->addCredits($user_id, $userCredits);
 
             $this->userProvidingService = new UserProvidingService();

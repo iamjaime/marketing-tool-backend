@@ -233,8 +233,8 @@ class OrderController extends Controller
      */
     public function pool()
     {
-        $user = $this->user->findByEmail(env('MARKETING_TOOL_ADMIN_EMAIL'));
-        $pool = $user->credits * Config::get('marketingtool.smi_pool');
+        $user = $this->user->find(Config::get('marketingtool.smi_pool_account_id'));
+        $pool = $user->credits;
 
         return response()->json([
             'success' => true,
