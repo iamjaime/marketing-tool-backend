@@ -113,7 +113,7 @@ class ResetPasswordController extends Controller
             return response()->json([
                 'success' => false,
                 'data' => [
-                    "account" => ['There is no record of this account trying to reset it\'s password']  
+                    "account" => ['There is no record of this account trying to reset it\'s password']
                 ]
             ], 400);
 
