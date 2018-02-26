@@ -99,11 +99,25 @@ class ResetPasswordController extends Controller
 
         //$this->validate($request, $this->rules(), $this->validationErrorMessages());
 
-        $user = User::where('email', $data['email'])->first();
-        $user->password = Hash::make($data['password']);
-        $user->save();
+        //first lets check to make sure that we have the correct user....
+        $user = DB::table('password_resets')->where('email', $data['email'])->where('token', '=', $data['token'])->first();
 
-        $resetData = DB::table('password_resets')->where('email', $user->email)->where('token', '=', $data['token'])->delete();
+        if($user) {
+            $usr = User::where('email', $data['email'])->first();
+            $usr->password = Hash::make($data['password']);
+            $usr->save();
+
+            $resetData = DB::table('password_resets')->where('email', $usr->email)->where('token', '=', $data['token'])->delete();
+        }else{
+
+            return response()->json([
+                'success' => false,
+                'data' => [
+                    "account" => ['There is no record of this account trying to reset it\'s password']  
+                ]
+            ], 400);
+
+        }
 
         return response()->json([
             'success' => true
