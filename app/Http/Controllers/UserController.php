@@ -168,24 +168,30 @@ class UserController extends Controller
     {
         $data = $request->get('data');
 
-        //validate....
-        $rules = $this->userAttachedServiceProvider->create_rules;
-        $validator = $this->validate($request, $rules);
+        $attachedUser = $this->userAttachedServiceProvider->findByUserIdAndProviderId($this->userId(), $data['provider_id'], $data['provider_account_id']);
 
-        if(!empty($validator)){
+        if(!$attachedUser){
+            //validate....
+            $rules = $this->userAttachedServiceProvider->create_rules;
+            $validator = $this->validate($request, $rules);
+
+            if(!empty($validator)){
+                return response()->json([
+                    'success' => false,
+                    'data' => $validator
+                ], 400);
+            }
+
+
+            //If we pass validation lets create and output success :)
+            $attachUserToServiceProvider = $this->userAttachedServiceProvider->create($this->userId(), $data);
+
             return response()->json([
-                'success' => false,
-                'data' => $validator
-            ], 400);
+                'success' => true,
+                'data' => $attachUserToServiceProvider
+            ], 201);
+
         }
-
-        //If we pass validation lets create and output success :)
-        $attachUserToServiceProvider = $this->userAttachedServiceProvider->create($this->userId(), $data);
-
-        return response()->json([
-            'success' => true,
-            'data' => $attachUserToServiceProvider
-        ], 201);
     }
 
 
