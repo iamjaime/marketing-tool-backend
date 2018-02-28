@@ -216,6 +216,21 @@ class OrderController extends Controller
             ], 400);
         }
 
+        //Validate Facebook Post......
+        if($data['provider_id'] == 1){
+            $fbPostValidation = $this->userProvidingService->validateFacebookPost($data, $this->userId());
+
+            if(!$fbPostValidation){
+                return response()->json([
+                    'success' => false,
+                    'data' => [
+                        "job" => ['There is no record of the job being completed.']
+                    ]
+                ], 400);
+            }
+        }
+
+
         //If we pass validation lets fill the order
         $order = $this->userProvidingService->create($this->userId(), $data);
 

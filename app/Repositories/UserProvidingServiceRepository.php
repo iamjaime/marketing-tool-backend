@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Repositories\UserAttachedServiceProviderRepository as UserAttachedService;
 use App\Repositories\UserRepository as User;
 use Illuminate\Support\Facades\Config;
+use SammyK\LaravelFacebookSdk\LaravelFacebookSdk as Facebook;
 
 class UserProvidingServiceRepository implements UserProvidingServiceRepositoryContract
 {
@@ -16,6 +17,7 @@ class UserProvidingServiceRepository implements UserProvidingServiceRepositoryCo
     protected $order;
     protected $userAttachedService;
     protected $user;
+    protected $facebook;
 
 
     /**
@@ -37,11 +39,12 @@ class UserProvidingServiceRepository implements UserProvidingServiceRepositoryCo
     ];
 
 
-    public function __construct(UserProvidingService $userProvidingService, Order $order, UserAttachedService $userAttachedService, User $user){
+    public function __construct(UserProvidingService $userProvidingService, Order $order, UserAttachedService $userAttachedService, User $user, Facebook $facebook){
         $this->userProvidingService = $userProvidingService;
         $this->order = $order;
         $this->userAttachedService = $userAttachedService;
         $this->user = $user;
+        $this->facebook = $facebook;
     }
 
     /**
@@ -209,6 +212,43 @@ class UserProvidingServiceRepository implements UserProvidingServiceRepositoryCo
         }
         $userProvidingService->delete();
         return true;
+    }
+
+
+    /**
+     * Handles validating facebook post from user
+     *
+     * @param $data
+     * @return bool
+     */
+    public function validateFacebookPost($data, $user_id)
+    {
+
+        $order = $this->order->where('id', '=', $data['order_id'])->first();
+
+        try {
+            $response = $this->facebook->get('/'. $data['provider_account_id'].'?fields=posts.limit(1){caption,link,privacy}', $data['fb_token']);
+        } catch(\Facebook\Exceptions\FacebookSDKException $e) {
+            return false;
+        }
+
+        $userNode = $response->getGraphUser();
+
+        $link = $userNode['posts'][0]['link'] . '?ref=' . $user_id;
+        $privacy = $userNode['posts'][0]['privacy']['description'];
+
+        $newString = explode("?ref=", $userNode['posts'][0]['link']);
+
+        $oldString = $newString[0];
+        $oldString = rtrim($oldString, '/');
+
+        $link = $oldString;
+
+        if($order->url == $link && $privacy == 'Public' || $order->url == $link && $privacy == 'Your friends'){
+            return true;
+        }else{
+            return false;
+        }
     }
 
 }
