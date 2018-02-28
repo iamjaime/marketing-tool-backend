@@ -229,6 +229,7 @@ class UserProvidingServiceRepository implements UserProvidingServiceRepositoryCo
         try {
             $response = $this->facebook->get('/'. $data['provider_account_id'].'?fields=posts.limit(1){caption,link,privacy}', $data['fb_token']);
         } catch(\Facebook\Exceptions\FacebookSDKException $e) {
+            dd($e->getMessage());
             return false;
         }
 
