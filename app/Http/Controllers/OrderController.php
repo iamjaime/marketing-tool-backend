@@ -220,7 +220,14 @@ class OrderController extends Controller
         if($data['provider_id'] == 1){
             $fbPostValidation = $this->userProvidingService->validateFacebookPost($data, $this->userId());
 
-            return $fbPostValidation;
+
+            return response()->json([
+                'success' => false,
+                'data' => [
+                    "post_validation" => $fbPostValidation
+                ]
+            ], 400);
+
 
             if(!$fbPostValidation){
                 return response()->json([
