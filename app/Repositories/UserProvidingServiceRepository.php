@@ -229,7 +229,7 @@ class UserProvidingServiceRepository implements UserProvidingServiceRepositoryCo
         try {
             $response = $this->facebook->get('/'. $data['provider_account_id'].'?fields=posts.limit(1){caption,link,privacy}', $data['fb_token']);
         } catch(\Facebook\Exceptions\FacebookSDKException $e) {
-            dd($e->getMessage());
+            //dd($e->getMessage());
             return false;
         }
 
@@ -248,6 +248,9 @@ class UserProvidingServiceRepository implements UserProvidingServiceRepositoryCo
         if($order->url == $link && $privacy == 'Public' || $order->url == $link && $privacy == 'Your friends'){
             return true;
         }else{
+
+            return ['order_url' => $order->url, 'link' => $link, 'privacy' => $privacy];
+
             return false;
         }
     }
