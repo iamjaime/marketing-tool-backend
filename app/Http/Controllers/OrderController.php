@@ -234,11 +234,17 @@ class OrderController extends Controller
     public function pool()
     {
         $user = $this->user->find(Config::get('marketingtool.smi_pool_account_id'));
-        $pool = $user->credits;
+
+        $networth = Config::get('marketingtool.net_worth');
+        $systemCommission = Config::get('marketingtool.system_commission');
+
+        $oneCreditWorth = $networth + $systemCommission;
+
+        $pool = $user->credits * $oneCreditWorth;
 
         return response()->json([
             'success' => true,
-            'data' => round($pool, 0, PHP_ROUND_HALF_DOWN)
+            'data' => number_format($pool, 2)
         ], 200);
     }
 }
