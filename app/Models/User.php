@@ -23,7 +23,8 @@ class User extends Authenticatable
         'city',
         'province',
         'postal_code',
-        'country'
+        'country',
+        'stripe_customer_id'
     ];
 
     /**
@@ -63,5 +64,14 @@ class User extends Authenticatable
     public function purchasedOrders()
     {
         return $this->hasMany('App\Models\Order', 'user_id');
+    }
+
+    /**
+     * Handles getting the user's attached payment methods
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function paymentMethods()
+    {
+        return $this->hasMany('App\Models\PaymentMethod', 'user_id');
     }
 }

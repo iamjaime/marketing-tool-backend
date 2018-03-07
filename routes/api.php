@@ -24,6 +24,8 @@ Route::group(['prefix' => 'v1'], function () {
     //The SMI Pool - UnAuthenticated Endpoint
     Route::get('smi/pool', 'OrderController@pool');
 
+    Route::post('stripe/charge', 'PaymentController@chargeCard');
+
 
     //Reset Password
     Route::post('password/email', 'Auth\ForgotPasswordController@getResetToken');

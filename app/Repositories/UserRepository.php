@@ -49,7 +49,7 @@ class UserRepository implements UserRepositoryContract
      */
     public function find($id)
     {
-        $user = $this->user->where('id', $id)->with(['primaryLanguage', 'attachedNetworks.provider'])->first();
+        $user = $this->user->where('id', $id)->with(['primaryLanguage', 'attachedNetworks.provider', 'paymentMethods'])->first();
         return $user;
     }
 
@@ -61,7 +61,7 @@ class UserRepository implements UserRepositoryContract
      */
     public function findByEmail($email)
     {
-        $user = $this->user->where('email', $email)->with(['primaryLanguage', 'attachedNetworks.provider'])->first();
+        $user = $this->user->where('email', $email)->with(['primaryLanguage', 'attachedNetworks.provider', 'paymentMethods'])->first();
         return $user;
     }
 
@@ -75,13 +75,9 @@ class UserRepository implements UserRepositoryContract
     public function create(array $data)
     {
         $this->user = new User();
-        $this->user->forceFill([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => bcrypt($data['password']),
-            'primary_language_id' => 1 //default to English initially when the account is first created.
-        ]);
-
+        $data['primary_language_id'] = 1;
+        $data['password'] = bcrypt($data['password']);
+        $this->user->fill($data);
         $this->user->save();
 
         return $this->user;
