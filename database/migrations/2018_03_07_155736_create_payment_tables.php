@@ -44,7 +44,7 @@ class CreatePaymentTables extends Migration
 
             $table->integer('amount');
 
-            $table->string('plan');
+            $table->string('plan')->nullable();
 
             $table->string('status');
 

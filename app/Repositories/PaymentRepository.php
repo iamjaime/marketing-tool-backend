@@ -128,7 +128,7 @@ class PaymentRepository
                 'customer' => $user->stripe_customer_id,
                 'currency' => 'USD',
                 'amount'   => $amount,
-                'source' => $card['id']
+                'source' => $card->stripe_card_id
             ]);
         }else{
 
@@ -153,7 +153,10 @@ class PaymentRepository
         $payment->card_id = $card->id;
         $payment->save();
 
-        return $charge['id'];
+
+        $payment->meta_data = unserialize($payment->meta_data);
+
+        return $payment;
     }
 
 
