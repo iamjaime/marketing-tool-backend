@@ -178,6 +178,7 @@ return [
         App\Providers\RouteServiceProvider::class,
         SammyK\LaravelFacebookSdk\LaravelFacebookSdkServiceProvider::class,
         Cartalyst\Stripe\Laravel\StripeServiceProvider::class,
+        App\Providers\CountryServiceProvider::class,
 
     ],
 
@@ -229,6 +230,7 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
         'Facebook' => SammyK\LaravelFacebookSdk\FacebookFacade::class,
         'Stripe' => Cartalyst\Stripe\Laravel\Facades\Stripe::class,
+        'Countries' => Webpatser\Countries\CountriesFacade::class,
 
     ],
 

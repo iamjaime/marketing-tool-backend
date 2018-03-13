@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
-
+use App\Utils\Country;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -31,6 +31,9 @@ Route::group(['prefix' => 'v1'], function () {
     Route::post('password/email', 'Auth\ForgotPasswordController@getResetToken');
     Route::post('password/reset', 'Auth\ResetPasswordController@reset');
 
+    Route::get('countries', function(){
+       return Country::all();
+    });
 
     //Require Authentication...
     Route::group(['middleware' => 'auth:api'], function(){

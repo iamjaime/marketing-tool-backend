@@ -8,6 +8,8 @@ use App\Utils\ValidatesRequestsWithWrapper;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Auth;
 
+use
+
 class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequestsWithWrapper;

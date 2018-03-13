@@ -13,7 +13,8 @@
         "laravel/passport": "^4.0",
         "laravel/tinker": "~1.0",
         "sammyk/laravel-facebook-sdk": "^3.5",
-        "cartalyst/stripe-laravel": "7.0.*"
+        "cartalyst/stripe-laravel": "7.0.*",
+        "webpatser/laravel-countries": "dev-master"
     },
     "require-dev": {
         "filp/whoops": "~2.0",
