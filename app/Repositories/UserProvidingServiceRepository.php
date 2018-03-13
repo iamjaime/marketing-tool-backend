@@ -250,7 +250,12 @@ class UserProvidingServiceRepository implements UserProvidingServiceRepositoryCo
         //remove trailing slash if it has one
         $link = rtrim($url, '/');
 
-        return ['original_url' => $originalUrl, 'link' => $link, 'ref_param' => $refParam];
+        return [
+            'original_url' => $originalUrl,
+            'link' => $link,
+            'ref_param' => $refParam,
+            'order_url_and_ref' => $order->url . $refParam
+        ];
 
         if($order->url . $refParam == $link && $privacy == 'Public' || $order->url == $link && $privacy == 'Your friends'){
             return true;
