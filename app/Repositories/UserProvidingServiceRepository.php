@@ -234,17 +234,21 @@ class UserProvidingServiceRepository implements UserProvidingServiceRepositoryCo
 
         $userNode = $response->getGraphUser();
 
-        $link = $userNode['posts'][0]['link'] . '?ref=' . $user_id;
+        $url = $userNode['posts'][0]['link'];
+        $link = parse_url($url, PHP_URL_QUERY);
+
+        if($link){
+            $refParam = '&smiref=' . $user_id;
+        }else{
+            $refParam = '?smiref=' . $user_id;
+        }
+
         $privacy = $userNode['posts'][0]['privacy']['description'];
 
-        $newString = explode("?ref=", $userNode['posts'][0]['link']);
+        //remove trailing slash if it has one
+        $link = rtrim($url, '/');
 
-        $oldString = $newString[0];
-        $oldString = rtrim($oldString, '/');
-
-        $link = $oldString;
-
-        if($order->url == $link && $privacy == 'Public' || $order->url == $link && $privacy == 'Your friends'){
+        if($order->url . $refParam == $link . $refParam && $privacy == 'Public' || $order->url . $refParam == $link . $refParam && $privacy == 'Your friends'){
             return true;
         }else{
             return false;
