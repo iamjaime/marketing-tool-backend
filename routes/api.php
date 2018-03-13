@@ -27,6 +27,10 @@ Route::group(['prefix' => 'v1'], function () {
     Route::post('stripe/charge', 'PaymentController@chargeCard');
 
 
+    //Stats
+    Route::get('smi-stats', 'StatController@index');
+
+
     //Reset Password
     Route::post('password/email', 'Auth\ForgotPasswordController@getResetToken');
     Route::post('password/reset', 'Auth\ResetPasswordController@reset');
