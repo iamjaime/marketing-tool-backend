@@ -18,6 +18,7 @@ class StatRepository
             'potential_traffic' => $this->getTotalTraffic(),
             'total_workers' => $this->getTotalWorkers(),
             'total_completed_orders' => $this->getTotalCompletedOrders(),
+            'total_orders_filled' => $this->getTotalOrdersFilled(),
             'total_views_provided' => $this->getTotalViewsProvided(),
             'families_helped' => $this->getFamiliesHelped()
         ];
@@ -55,6 +56,17 @@ class StatRepository
     public function getTotalCompletedOrders()
     {
         $orders = DB::table('orders')->where('is_complete', true)->count();
+        return $orders;
+    }
+
+    /**
+     * Handles getting the total count of filled orders
+     *
+     * @return mixed
+     */
+    public function getTotalOrdersFilled()
+    {
+        $orders = DB::table('user_providing_services')->count();
         return $orders;
     }
 
