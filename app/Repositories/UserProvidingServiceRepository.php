@@ -240,7 +240,7 @@ class UserProvidingServiceRepository implements UserProvidingServiceRepositoryCo
         if($link){
             $url = $url . '&smiref=' . $user_id;
         }else{
-            $url = $url . '&smiref=' . $user_id;
+            $url = $url . '?smiref=' . $user_id;
         }
 
         $privacy = $userNode['posts'][0]['privacy']['description'];
@@ -248,6 +248,8 @@ class UserProvidingServiceRepository implements UserProvidingServiceRepositoryCo
         //remove trailing slash if it has one
         $link = rtrim($url, '/');
 
+
+        return ['order_url' => $order->url, 'link' => $link];
 
         if($order->url == $link && $privacy == 'Public' || $order->url == $link && $privacy == 'Your friends'){
             return true;
