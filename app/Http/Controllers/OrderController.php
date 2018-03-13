@@ -221,14 +221,6 @@ class OrderController extends Controller
 
             $fbPostValidation = $this->userProvidingService->validateFacebookPost($data, $this->userId());
 
-            return response()->json([
-                'success' => false,
-                'debug' => $fbPostValidation,
-                'data' => [
-                    "job" => ['There is no record of the job being completed.']
-                ]
-            ], 400);
-
             if(!$fbPostValidation){
                 return response()->json([
                     'success' => false,
