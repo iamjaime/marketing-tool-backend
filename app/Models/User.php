@@ -74,4 +74,14 @@ class User extends Authenticatable
     {
         return $this->hasMany('App\Models\PaymentMethod', 'user_id');
     }
+
+    /**
+     * Handles getting the companies that belong to the logged in user
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function companies()
+    {
+        return $this->hasMany('App\Models\Company', 'user_id');
+    }
 }

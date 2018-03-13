@@ -57,6 +57,8 @@ Route::group(['prefix' => 'v1'], function () {
         //Handles filling the purchase order :)
         Route::post('orders/fill', 'OrderController@fill');
 
+        //Companies Resource
+        Route::resource('company', 'CompanyController', ['only' => ['show', 'store', 'update', 'destroy']]);
 
     });
 
