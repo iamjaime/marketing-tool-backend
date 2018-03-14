@@ -236,7 +236,7 @@ class UserProvidingServiceRepository implements UserProvidingServiceRepositoryCo
 
         $url = $userNode['posts'][0]['link'];
 
-        //$originalUrl = $url;
+        $originalUrl = $url;
 
 
         $link = explode($order->url, $url);
@@ -249,7 +249,7 @@ class UserProvidingServiceRepository implements UserProvidingServiceRepositoryCo
         $privacy = $userNode['posts'][0]['privacy']['description'];
 
 
-        //return ['original_ur' => $originalUrl, 'link' => $link, 'refparam' => $refParam, 'order_url_refparam' => $order->url . $refParam];
+        return ['original_url' => $originalUrl, 'link' => $link, 'refparam' => $refParam, 'order_url_refparam' => $order->url . $refParam];
 
         if($order->url . $refParam == $link . $refParam && $privacy == 'Public' || $order->url . $refParam == $link . $refParam && $privacy == 'Your friends'){
             return true;
