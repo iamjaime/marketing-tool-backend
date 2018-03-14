@@ -238,13 +238,20 @@ class UserProvidingServiceRepository implements UserProvidingServiceRepositoryCo
 
         $originalUrl = $url;
 
-        $link = parse_url($url, PHP_URL_QUERY);
 
-        if($link){
-            $refParam = '&smiref=' . $user_id;
-        }else{
-            $refParam = '?smiref=' . $user_id;
-        }
+        $link = explode($order->url, $url);
+
+
+
+//        $link = parse_url($url, PHP_URL_QUERY);
+
+//        if($link){
+//            $refParam = '&smiref=' . $user_id;
+//        }else{
+//            $refParam = '?smiref=' . $user_id;
+//        }
+
+
 
         $privacy = $userNode['posts'][0]['privacy']['description'];
 
