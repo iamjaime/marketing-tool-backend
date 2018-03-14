@@ -240,7 +240,7 @@ class UserProvidingServiceRepository implements UserProvidingServiceRepositoryCo
 
 
         $link = explode($order->url, $url);
-
+        $refParam = $link[1];
 
 
 //        $link = parse_url($url, PHP_URL_QUERY);
