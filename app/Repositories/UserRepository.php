@@ -75,7 +75,9 @@ class UserRepository implements UserRepositoryContract
     public function create(array $data)
     {
         $this->user = new User();
+
         $data['primary_language_id'] = 1;
+        $this->user->primary_language_id = $data['primary_language_id'];
         $data['password'] = bcrypt($data['password']);
         $this->user->fill($data);
         $this->user->save();
