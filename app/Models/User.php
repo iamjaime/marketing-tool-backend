@@ -24,7 +24,10 @@ class User extends Authenticatable
         'province',
         'postal_code',
         'country',
-        'stripe_customer_id'
+        'stripe_customer_id',
+        'referred_by',
+        'heard_about_smi',
+        'interested_in',
     ];
 
     /**
