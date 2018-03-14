@@ -235,6 +235,9 @@ class UserProvidingServiceRepository implements UserProvidingServiceRepositoryCo
         $userNode = $response->getGraphUser();
 
         $url = $userNode['posts'][0]['link'];
+
+        $originalUrl = $url;
+
         $link = parse_url($url, PHP_URL_QUERY);
 
         if($link){
@@ -247,6 +250,9 @@ class UserProvidingServiceRepository implements UserProvidingServiceRepositoryCo
 
         //remove trailing slash if it has one
         $link = rtrim($url, '/');
+
+
+        return ['original_ur' => $originalUrl, 'link' => $link, 'refparam' => $refParam, 'order_url_refparam' => $order->url . $refParam];
 
         if($order->url . $refParam == $link . $refParam && $privacy == 'Public' || $order->url . $refParam == $link . $refParam && $privacy == 'Your friends'){
             return true;
