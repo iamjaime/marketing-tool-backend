@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Contracts\Repositories\UserRepository as UserRepositoryContract;
 use App\Models\User;
+use Carbon\Carbon;
 
 
 class UserRepository implements UserRepositoryContract
@@ -79,6 +80,11 @@ class UserRepository implements UserRepositoryContract
         $data['primary_language_id'] = 1;
         $this->user->primary_language_id = $data['primary_language_id'];
         $data['password'] = bcrypt($data['password']);
+
+        if(isset($data['dob'])){
+            $data['dob'] = Carbon::createFromFormat('m/d/Y', $data['dob'])->format('Y-m-d');
+        }
+
         $this->user->fill($data);
         $this->user->save();
 
@@ -100,6 +106,11 @@ class UserRepository implements UserRepositoryContract
         if(isset($data['password'])){
             $data['password'] = bcrypt($data['password']);
         }
+
+        if(isset($data['dob'])){
+            $data['dob'] = Carbon::createFromFormat('m/d/Y', $data['dob'])->format('Y-m-d');
+        }
+
         $user->fill($data);
         $user->save();
 
