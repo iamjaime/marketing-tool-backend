@@ -25,6 +25,11 @@ class AddParamsForLocalMarketing extends Migration
             $table->decimal('latitude', 10, 8)->after('url')->nullable();
             $table->decimal('longitude', 11, 8)->after('latitude')->nullable();
         });
+
+        Schema::table('companies', function (Blueprint $table) {
+            $table->decimal('latitude', 10, 8)->after('is_active')->nullable();
+            $table->decimal('longitude', 11, 8)->after('latitude')->nullable();
+        });
     }
 
     /**
@@ -43,6 +48,11 @@ class AddParamsForLocalMarketing extends Migration
         });
 
         Schema::table('orders', function($table) {
+            $table->dropColumn('latitude');
+            $table->dropColumn('longitude');
+        });
+
+        Schema::table('companies', function($table) {
             $table->dropColumn('latitude');
             $table->dropColumn('longitude');
         });
