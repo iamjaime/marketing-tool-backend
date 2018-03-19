@@ -20,6 +20,11 @@ class AddParamsForLocalMarketing extends Migration
             $table->string('locale')->after('dob')->nullable();
             $table->string('gender')->after('locale')->nullable();
         });
+
+        Schema::table('orders', function (Blueprint $table) {
+            $table->decimal('latitude', 10, 8)->after('url')->nullable();
+            $table->decimal('longitude', 11, 8)->after('latitude')->nullable();
+        });
     }
 
     /**
@@ -35,6 +40,11 @@ class AddParamsForLocalMarketing extends Migration
             $table->dropColumn('dob');
             $table->dropColumn('locale');
             $table->dropColumn('gender');
+        });
+
+        Schema::table('orders', function($table) {
+            $table->dropColumn('latitude');
+            $table->dropColumn('longitude');
         });
     }
 }
