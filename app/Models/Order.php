@@ -15,7 +15,9 @@ class Order extends Model
         'quantity',
         'is_complete',
         'progress',
-        'url'
+        'url',
+        'latitude',
+        'longitude'
     ];
 
     /**

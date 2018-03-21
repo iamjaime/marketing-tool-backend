@@ -50,7 +50,7 @@ class CreateCompanies extends Migration
             $table->integer('engagement_bonus_in_smi_credits_per_sale')->nullable(); //How many SMI are you willing to pay SMI workers as a bonus for converting sales?
 
 
-            $table->text('when_do_you_want_to_begin'); //when do they want to begin marking with us?
+            $table->dateTime('when_do_you_want_to_begin'); //when do they want to begin marking with us?
 
 
             $table->timestamps();

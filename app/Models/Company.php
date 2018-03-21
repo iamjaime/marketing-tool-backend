@@ -19,6 +19,8 @@ class Company extends Model
      * @var array
      */
     protected $fillable = [
+        'latitude',
+        'longitude',
         'company_name',
         'company_email',
         'company_phone',

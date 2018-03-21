@@ -28,6 +28,11 @@ class User extends Authenticatable
         'referred_by',
         'heard_about_smi',
         'interested_in',
+        'latitude',
+        'longitude',
+        'dob',
+        'locale',
+        'gender',
     ];
 
     /**
