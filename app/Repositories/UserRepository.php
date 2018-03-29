@@ -187,21 +187,5 @@ class UserRepository implements UserRepositoryContract
 
 
 
-      /**
-     * Set credits
-     *
-     * @param array $data
-     * @return User
-     */
-    public function credits(    $data )
-    { 
-        $dataStripe =  $data ['object'];
-        $dataStripePlan =  $dataStripe ['plan'];
-        $user = $this->user->where('stripe_customer_id',  $dataStripe['customer'])->first(); 
-        $data['credits']=$dataStripePlan['amount']; 
-        $user->fill($data);
-        $user->save(); 
-         return $user;
-    }
-
+      
 }

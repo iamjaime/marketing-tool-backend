@@ -222,12 +222,21 @@ class PaymentRepository
         
                 if(empty($user->payment_methods)){
                     $card = $this->createCard($user_id, $token); 
-                    $charge = $this->merchant->subscriptions()->create( $user->stripe_customer_id, [ 'plan' => $plan ]);
+                    $invoiceItem = $this->merchant->invoiceItems()->create($user->stripe_customer_id, [
+                        'amount'   => 2.50,
+                        'currency' => 'USD',
+                    ]);
+                    $charge = $this->merchant->subscriptions()->create( $user->stripe_customer_id, [  'plan' => $plan,  'quantity' => 5]);
                     $subscription = $this->merchant->subscriptions()->find($user->stripe_customer_id, $charge['id']);
+                     
                 }else{
         
-                    $card = $user->payment_methods[0];
-                    $charge = $this->merchant->subscriptions()->create( $user->stripe_customer_id, [ 'plan' => $plan ]);
+                    $card = $user->payment_methods[0]; 
+                    $invoiceItem = $this->merchant->invoiceItems()->create($user->stripe_customer_id, [
+                        'amount'   => 2.50,
+                        'currency' => 'USD',
+                    ]);
+                    $charge = $this->merchant->subscriptions()->create( $user->stripe_customer_id, [  'plan' => $plan,  'quantity' => 5]);
                     $subscription = $this->merchant->subscriptions()->find($user->stripe_customer_id, $charge['id']);
                      
                 }
@@ -244,10 +253,39 @@ class PaymentRepository
                 $payment->status  = $subscription['status'];
                 $payment->card_id = $card->id;
                 $payment->save();  
-        
+                $payment->subscription_metaData = $subscription ;
                 return $payment ;
     }
  
-   
+    /**
+     * Set credits
+     *
+     * @param array $data
+     * @return User
+     */
+    public function credits(    $data )
+    { 
+        $dataStripe =  $data ['object'];
+        $dataStripePlan =  $dataStripe ['plan'];
+        $user = $this->user->where('stripe_customer_id',  $dataStripe['customer'])->first(); 
+        $data['credits']=$dataStripePlan['amount']; 
+        $user->fill($data);
+        $user->save(); 
+         return $user;
+    }
+
+
+    public function processingFees($data,$eventTypes){
+        if($eventTypes =='invoice.created'){
+            $invoiceItem = $this->merchant->invoiceItems()->create($data['object']['customer'], [
+                'subscription'=> $data['object']['subscription'],
+                'amount'   => 12.00,
+                'currency' => 'USD',
+                'description'=>'proccess fee'
+            ]); 
+            return $invoiceItem;
+        }
+
+    }
 
 }

@@ -100,6 +100,38 @@ class PaymentController extends Controller
             
     }
 
+     /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function getCredits(Request $request)
+    {
+        $data = $request->get('data'); 
+        $eventType = $request->get('type'); 
+         
+
+        //validate....
+        // $rules = $this->user->update_rules;
+        // $validator = $this->validate($request, $rules);
+
+        // if(!empty($validator)){
+        //     return response()->json([
+        //         'success' => false,
+        //         'data' => $validator
+        //     ], 400);
+        // }
+  
+        //If we pass validation lets update user and output success :)
+        $user = $this->payment->processingFees($data, $eventType);
+
+        return response()->json([
+            'success' => true,
+            'data' => $user
+        ], 200);
+    }
+
 
 
 
