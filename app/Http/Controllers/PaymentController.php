@@ -58,4 +58,52 @@ class PaymentController extends Controller
     }
 
 
+
+    /**
+     * Handles subscribing user to a plan
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function plans(Request $request)
+    {
+        $data = $request->get('data'); 
+          
+                    //validate....
+                    $rules = $this->payment->create_charge_rules_plan;
+                    $validator = $this->validate($request, $rules);
+            
+                    if(!empty($validator)){
+                        return response()->json([
+                            'success' => false,
+                            'data' => $validator
+                        ], 400);
+                    }
+            
+                    //If we pass validation lets create user and output success :)
+                    $stripeCustomer = $this->payment->createCustomer($this->userId());
+                    
+                    if($stripeCustomer->stripe_customer_id){
+                       
+                        $payment = $this->payment->subscriptions( $this->userId(), $data['plan'], $data['token'] );
+                        return response()->json([
+                            'success' => true,
+                            'data' => $payment
+                        ], 201);
+                    }
+            
+            
+                    return response()->json([
+                        'success' => false,
+                        'data' => ['error' => ['message' => 'there was an error charging the card']]
+                    ], 400);
+            
+    }
+
+
+
+
+
+      
+
 }

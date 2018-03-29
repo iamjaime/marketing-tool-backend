@@ -23,6 +23,14 @@ class PaymentRepository
     ];
 
     /**
+     * Handles the create charge validation rules.
+     * @var array
+     */
+    public $create_charge_rules_plan= [
+        'plan' => 'required' 
+    ];
+
+    /**
      * Handles the update order validation rules.
      * @var array
      */
@@ -160,6 +168,10 @@ class PaymentRepository
     }
 
 
+
+      
+
+    
     /**
      * Handles subscribing user to a plan
      *
@@ -190,5 +202,52 @@ class PaymentRepository
 
         return $subscription['id'];
     }
+
+
+
+
+
+
+
+
+     /**
+     * Handles subscribing user to a plan
+     *
+     * @param $user_id 
+     */
+    public function subscriptions($user_id, $plan,$token)
+    {
+        
+        $user = $this->user->find($user_id);
+        
+                if(empty($user->payment_methods)){
+                    $card = $this->createCard($user_id, $token); 
+                    $charge = $this->merchant->subscriptions()->create( $user->stripe_customer_id, [ 'plan' => $plan ]);
+                    $subscription = $this->merchant->subscriptions()->find($user->stripe_customer_id, $charge['id']);
+                }else{
+        
+                    $card = $user->payment_methods[0];
+                    $charge = $this->merchant->subscriptions()->create( $user->stripe_customer_id, [ 'plan' => $plan ]);
+                    $subscription = $this->merchant->subscriptions()->find($user->stripe_customer_id, $charge['id']);
+                     
+                }
+                
+                $dataPlan =$subscription['plan'];
+                 $card = PaymentMethod::where('stripe_card_id','=', $card['stripe_card_id'])->where('user_id', '=', $user_id)->first();
+        
+                $payment = new Payment();
+                $payment->user_id = $user_id;
+                $payment->charge_id = $subscription['id'];
+                $payment->amount = $dataPlan['amount'];
+                $payment->plan = $plan;
+                $payment->meta_data = serialize($subscription);
+                $payment->status  = $subscription['status'];
+                $payment->card_id = $card->id;
+                $payment->save();  
+        
+                return $payment ;
+    }
+ 
+   
 
 }

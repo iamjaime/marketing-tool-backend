@@ -21,6 +21,7 @@ class User extends Authenticatable
         'password',
         'avatar',
         'city',
+        'credits',
         'province',
         'postal_code',
         'country',

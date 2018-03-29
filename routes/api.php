@@ -23,8 +23,10 @@ Route::group(['prefix' => 'v1'], function () {
 
     //The SMI Pool - UnAuthenticated Endpoint
     Route::get('smi/pool', 'OrderController@pool');
-
+    // stripe
     Route::post('stripe/charge', 'PaymentController@chargeCard');
+    Route::post('stripe/plans', 'PaymentController@plans');
+    Route::post('stripe/credits', 'UserController@getCredits');
 
 
     //Stats
@@ -45,6 +47,7 @@ Route::group(['prefix' => 'v1'], function () {
         //User Resource
         Route::get('users', 'UserController@index');
         Route::get('users/{id}', 'UserController@show');
+      
         Route::put('users', 'UserController@update'); //Updates the user that is logged in.
         Route::delete('users/{id}', 'UserController@destroy');
 
