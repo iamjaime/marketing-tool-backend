@@ -271,9 +271,11 @@ class PaymentRepository
 
             $views = $data['object']['lines']['data'][0]['quantity'];
 
+            $fees = $this->getProcessingFees($views);
+
             $invoiceItem = $this->merchant->invoiceItems()->create($data['object']['customer'], [
                 'subscription'=> $data['object']['subscription'],
-                'amount'   => $this->getProcessingFees($views),
+                'amount'   => $fees['processing_fees'],
                 'currency' => 'USD',
                 'description'=>'Processing Fees'
             ]); 
