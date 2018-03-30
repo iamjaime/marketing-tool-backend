@@ -2,13 +2,17 @@
 
 namespace App\Repositories;
 
+use App\Utils\ProcessingFees;
 use Cartalyst\Stripe\Stripe as Merchant;
 use App\Repositories\UserRepository as User;
 use App\Models\Payment;
 use App\Models\PaymentMethod;
+use Illuminate\Support\Facades\Config;
 
 class PaymentRepository
 {
+
+    use ProcessingFees;
 
     protected $merchant;
     protected $user;
@@ -27,7 +31,16 @@ class PaymentRepository
      * @var array
      */
     public $create_charge_rules_plan= [
-        'plan' => 'required' 
+        'views' => 'required',
+        'token' => 'required'
+    ];
+
+    /**
+     * Handles the webhook validation rules.
+     * @var array
+     */
+    public $webhook_rules = [
+        'object.customer' => 'required|exists:users,stripe_customer_id',
     ];
 
     /**
@@ -168,93 +181,61 @@ class PaymentRepository
     }
 
 
-
-      
-
-    
     /**
-     * Handles subscribing user to a plan
+     * Handles creating a subscription for a user
      *
      * @param $user_id
-     * @param $plan
-     * @return mixed
+     * @param $data
+     * @return Payment  The payment object that was inserted into the database
      */
-    public function subscribe($user_id, $plan, $token)
+    public function subscribe($user_id, $data)
     {
-        $user = $this->user->find($user_id);
+        $plan = Config::get('marketingtool.stripe_smi_credits_plan');
+        $token = $data['token'];
+        $views = $data['views'];
 
-        $subscription = $this->merchant->subscriptions()->create($user->stripe_customer_id, [
-            'plan' => $plan,
-            'source' => $token
-        ]);
-
-//        $card = PaymentMethod::where('stripe_card_id','=', $charge['source']['id'])->where('user_id', '=', $user_id)->first();
-//
-//        $payment = new Payment();
-//        $payment->user_id = $user_id;
-//        $payment->charge_id = $charge['id'];
-//        $payment->amount = $charge['amount'];
-//        $payment->plan = $charge['description'];
-//        $payment->status = $charge['status'];
-//        $payment->meta_data = serialize($charge);
-//        $payment->card_id = $card->id;
-//        $payment->save();
-
-        return $subscription['id'];
-    }
-
-
-
-
-
-
-
-
-     /**
-     * Handles subscribing user to a plan
-     *
-     * @param $user_id 
-     */
-    public function subscriptions($user_id, $plan,$token)
-    {
-        
         $user = $this->user->find($user_id);
         
-                if(empty($user->payment_methods)){
-                    $card = $this->createCard($user_id, $token); 
-                    $invoiceItem = $this->merchant->invoiceItems()->create($user->stripe_customer_id, [
-                        'amount'   => 2.50,
-                        'currency' => 'USD',
-                    ]);
-                    $charge = $this->merchant->subscriptions()->create( $user->stripe_customer_id, [  'plan' => $plan,  'quantity' => 5]);
-                    $subscription = $this->merchant->subscriptions()->find($user->stripe_customer_id, $charge['id']);
-                     
-                }else{
-        
-                    $card = $user->payment_methods[0]; 
-                    $invoiceItem = $this->merchant->invoiceItems()->create($user->stripe_customer_id, [
-                        'amount'   => 2.50,
-                        'currency' => 'USD',
-                    ]);
-                    $charge = $this->merchant->subscriptions()->create( $user->stripe_customer_id, [  'plan' => $plan,  'quantity' => 5]);
-                    $subscription = $this->merchant->subscriptions()->find($user->stripe_customer_id, $charge['id']);
-                     
-                }
-                
-                $dataPlan =$subscription['plan'];
-                 $card = PaymentMethod::where('stripe_card_id','=', $card['stripe_card_id'])->where('user_id', '=', $user_id)->first();
-        
-                $payment = new Payment();
-                $payment->user_id = $user_id;
-                $payment->charge_id = $subscription['id'];
-                $payment->amount = $dataPlan['amount'];
-                $payment->plan = $plan;
-                $payment->meta_data = serialize($subscription);
-                $payment->status  = $subscription['status'];
-                $payment->card_id = $card->id;
-                $payment->save();  
-                $payment->subscription_metaData = $subscription ;
-                return $payment ;
+        if(empty($user->payment_methods)){
+
+            $card = $this->createCard($user_id, $token);
+
+            $invoiceItem = $this->merchant->invoiceItems()->create($user->stripe_customer_id, [
+                'amount'   => $this->getProcessingFees($views),
+                'currency' => 'USD',
+            ]);
+
+            $charge = $this->merchant->subscriptions()->create( $user->stripe_customer_id, [  'plan' => $plan,  'quantity' => $views ]);
+            $subscription = $this->merchant->subscriptions()->find($user->stripe_customer_id, $charge['id']);
+
+        }else{
+
+            $card = $user->payment_methods[0];
+            $invoiceItem = $this->merchant->invoiceItems()->create($user->stripe_customer_id, [
+                'amount'   => $this->getProcessingFees($views),
+                'currency' => 'USD',
+            ]);
+            $charge = $this->merchant->subscriptions()->create( $user->stripe_customer_id, [  'plan' => $plan,  'quantity' =>  $views]);
+            $subscription = $this->merchant->subscriptions()->find($user->stripe_customer_id, $charge['id']);
+
+        }
+
+        $dataPlan = $subscription['plan'];
+        $card = PaymentMethod::where('stripe_card_id','=', $card['stripe_card_id'])->where('user_id', '=', $user_id)->first();
+
+        $payment = new Payment();
+        $payment->user_id = $user_id;
+        $payment->charge_id = $subscription['id'];
+        $payment->amount = $dataPlan['amount'];
+        $payment->plan = $plan;
+        $payment->meta_data = serialize($subscription);
+        $payment->status  = $subscription['status'];
+        $payment->card_id = $card->id;
+        $payment->save();
+
+        $payment->meta_data = $subscription;
+
+        return $payment ;
     }
  
     /**
@@ -275,13 +256,23 @@ class PaymentRepository
     }
 
 
-    public function processingFees($data,$eventTypes){
+    /**
+     * Handles attaching processing fees to the generated invoice
+     *
+     * @param $data
+     * @param $eventTypes
+     * @return mixed
+     */
+    public function attachProcessingFees($data,$eventTypes){
         if($eventTypes =='invoice.created'){
+
+            $views = $data['object']['amount_due'] / 2; //divide by 2 because 0.02 per view
+
             $invoiceItem = $this->merchant->invoiceItems()->create($data['object']['customer'], [
                 'subscription'=> $data['object']['subscription'],
-                'amount'   => 12.00,
+                'amount'   => $this->getProcessingFees($views),
                 'currency' => 'USD',
-                'description'=>'proccess fee'
+                'description'=>'Processing Fees'
             ]); 
             return $invoiceItem;
         }

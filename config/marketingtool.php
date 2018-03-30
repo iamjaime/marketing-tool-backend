@@ -14,4 +14,5 @@ return [
     'admin_account_id' => 1, //This is the administrator's id in the user's table (all commissions are sent here!)
     'admin_email' => env('MARKETING_TOOL_ADMIN_EMAIL', 'codehead@codelegends.com'), //This is the default admin email.
     'admin_password' => env('MARKETING_TOOL_ADMIN_PASSWORD', 'codelegends!$'), //This is the default admin email.
+    'stripe_smi_credits_plan' => env('STRIPE_SMI_CREDITS_PLAN', 'plan')
 ];

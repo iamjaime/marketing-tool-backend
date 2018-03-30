@@ -69,34 +69,34 @@ class PaymentController extends Controller
     {
         $data = $request->get('data'); 
           
-                    //validate....
-                    $rules = $this->payment->create_charge_rules_plan;
-                    $validator = $this->validate($request, $rules);
-            
-                    if(!empty($validator)){
-                        return response()->json([
-                            'success' => false,
-                            'data' => $validator
-                        ], 400);
-                    }
-            
-                    //If we pass validation lets create user and output success :)
-                    $stripeCustomer = $this->payment->createCustomer($this->userId());
-                    
-                    if($stripeCustomer->stripe_customer_id){
-                       
-                        $payment = $this->payment->subscriptions( $this->userId(), $data['plan'], $data['token'] );
-                        return response()->json([
-                            'success' => true,
-                            'data' => $payment
-                        ], 201);
-                    }
-            
-            
-                    return response()->json([
-                        'success' => false,
-                        'data' => ['error' => ['message' => 'there was an error charging the card']]
-                    ], 400);
+        //validate....
+        $rules = $this->payment->create_charge_rules_plan;
+        $validator = $this->validate($request, $rules);
+
+        if(!empty($validator)){
+            return response()->json([
+                'success' => false,
+                'data' => $validator
+            ], 400);
+        }
+
+        //If we pass validation lets create user and output success :)
+        $stripeCustomer = $this->payment->createCustomer($this->userId());
+
+        if($stripeCustomer->stripe_customer_id){
+
+            $payment = $this->payment->subscribe($this->userId(), $data);
+            return response()->json([
+                'success' => true,
+                'data' => $payment
+            ], 201);
+        }
+
+
+        return response()->json([
+            'success' => false,
+            'data' => ['error' => ['message' => 'there was an error charging the card']]
+        ], 400);
             
     }
 
@@ -106,29 +106,28 @@ class PaymentController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function getCredits(Request $request)
+    public function webHook(Request $request)
     {
         $data = $request->get('data'); 
         $eventType = $request->get('type'); 
          
 
-        //validate....
-        // $rules = $this->user->update_rules;
-        // $validator = $this->validate($request, $rules);
+        //validate that our customer exists in the db....
+         $rules = $this->payment->webhook_rules;
+         $validator = $this->validate($request, $rules);
 
-        // if(!empty($validator)){
-        //     return response()->json([
-        //         'success' => false,
-        //         'data' => $validator
-        //     ], 400);
-        // }
+         if(!empty($validator)){
+             return response()->json([
+                 'success' => false,
+                 'data' => $validator
+             ], 400);
+         }
   
-        //If we pass validation lets update user and output success :)
-        $user = $this->payment->processingFees($data, $eventType);
+        $fees = $this->payment->attachProcessingFees($data, $eventType);
 
         return response()->json([
             'success' => true,
-            'data' => $user
+            'data' => $fees
         ], 200);
     }
 
