@@ -15,7 +15,7 @@ trait ProcessingFees {
      * Handles getting the Processing Fees
      *
      * @param $value  The amount of views needed
-     * @return float  The processing fees.
+     * @return array  The processing fees.
      */
     public function getProcessingFees($value) {
         $percentRate = (1 - $this->percentProcessingFee);

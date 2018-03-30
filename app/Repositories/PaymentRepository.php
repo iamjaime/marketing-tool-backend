@@ -200,8 +200,10 @@ class PaymentRepository
 
             $card = $this->createCard($user_id, $token);
 
+            $fees = $this->getProcessingFees($views);
+
             $invoiceItem = $this->merchant->invoiceItems()->create($user->stripe_customer_id, [
-                'amount'   => $this->getProcessingFees($views),
+                'amount'   => $fees['processing_fees'],
                 'currency' => 'USD',
             ]);
 
@@ -211,8 +213,10 @@ class PaymentRepository
         }else{
 
             $card = $user->payment_methods[0];
+            $fees = $this->getProcessingFees($views);
+
             $invoiceItem = $this->merchant->invoiceItems()->create($user->stripe_customer_id, [
-                'amount'   => $this->getProcessingFees($views),
+                'amount'   => $fees['processing_fees'],
                 'currency' => 'USD',
             ]);
             $charge = $this->merchant->subscriptions()->create( $user->stripe_customer_id, [  'plan' => $plan,  'quantity' =>  $views]);
