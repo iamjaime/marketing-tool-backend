@@ -19,7 +19,7 @@ trait ProcessingFees {
      */
     public function getProcessingFees($value) {
         $percentRate = (1 - $this->percentProcessingFee);
-        $views = value * 2; //multiply by 2 because each view is 0.02
+        $views = $value * 2; //multiply by 2 because each view is 0.02
 
         $netAmount = ($views / 100);
 
