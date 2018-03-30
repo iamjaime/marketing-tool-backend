@@ -195,8 +195,8 @@ class PaymentRepository
         $views = $data['views'];
 
         $user = $this->user->find($user_id);
-        
-        if(empty($user->payment_methods)){
+
+        if($user->paymentMethods->isEmpty()){
 
             $card = $this->createCard($user_id, $token);
             $fees = $this->getProcessingFees($views);
@@ -204,6 +204,7 @@ class PaymentRepository
             $invoiceItem = $this->merchant->invoiceItems()->create($user->stripe_customer_id, [
                 'amount'   => $fees['processing_fees'],
                 'currency' => 'USD',
+                'description' => 'Processing Fees'
             ]);
 
             $charge = $this->merchant->subscriptions()->create( $user->stripe_customer_id, [  'plan' => $plan,  'quantity' => $views ]);
@@ -211,12 +212,13 @@ class PaymentRepository
 
         }else{
 
-            $card = $user->payment_methods[0];
+            $card = $user->paymentMethods[0];
             $fees = $this->getProcessingFees($views);
 
             $invoiceItem = $this->merchant->invoiceItems()->create($user->stripe_customer_id, [
                 'amount'   => $fees['processing_fees'],
                 'currency' => 'USD',
+                'description' => 'Processing Fees'
             ]);
             $charge = $this->merchant->subscriptions()->create( $user->stripe_customer_id, [  'plan' => $plan,  'quantity' =>  $views]);
             $subscription = $this->merchant->subscriptions()->find($user->stripe_customer_id, $charge['id']);
@@ -268,18 +270,20 @@ class PaymentRepository
      */
     public function attachProcessingFees($data,$eventTypes){
         if($eventTypes =='invoice.created'){
-
             $views = $data['object']['lines']['data'][0]['quantity'];
-
             $fees = $this->getProcessingFees($views);
 
-            $invoiceItem = $this->merchant->invoiceItems()->create($data['object']['customer'], [
-                'subscription'=> $data['object']['subscription'],
-                'amount'   => $fees['processing_fees'],
-                'currency' => 'USD',
-                'description'=>'Processing Fees'
-            ]); 
-            return $invoiceItem;
+            if($fees['processing_fees'] != "0.31"){
+
+                $invoiceItem = $this->merchant->invoiceItems()->create($data['object']['customer'], [
+                    'subscription'=> $data['object']['subscription'],
+                    'amount'   => $fees['processing_fees'],
+                    'currency' => 'USD',
+                    'description'=>'Processing Fees'
+                ]);
+                return $invoiceItem;
+            }
+
         }
 
     }

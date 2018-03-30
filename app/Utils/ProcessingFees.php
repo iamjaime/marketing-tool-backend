@@ -31,7 +31,7 @@ trait ProcessingFees {
 
         $fees = array(
             'net_amount' => $netAmount,
-            'processing_fees' => $processingFee
+            'processing_fees' => number_format($processingFee, 2)
         );
 
         return $fees;
