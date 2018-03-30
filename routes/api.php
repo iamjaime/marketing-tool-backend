@@ -26,7 +26,7 @@ Route::group(['prefix' => 'v1'], function () {
     // stripe
     Route::post('stripe/charge', 'PaymentController@chargeCard');
     Route::post('stripe/plans', 'PaymentController@plans');
-    Route::post('stripe/webhook', 'PaymentController@webhook');
+    Route::post('stripe/webhook', 'PaymentController@webHook');
 
 
     //Stats
