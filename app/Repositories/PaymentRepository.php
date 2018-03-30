@@ -202,6 +202,8 @@ class PaymentRepository
 
             $fees = $this->getProcessingFees($views);
 
+            dd($fees);
+
             $invoiceItem = $this->merchant->invoiceItems()->create($user->stripe_customer_id, [
                 'amount'   => $fees['processing_fees'],
                 'currency' => 'USD',
@@ -214,6 +216,8 @@ class PaymentRepository
 
             $card = $user->payment_methods[0];
             $fees = $this->getProcessingFees($views);
+
+            dd($fees);  
 
             $invoiceItem = $this->merchant->invoiceItems()->create($user->stripe_customer_id, [
                 'amount'   => $fees['processing_fees'],
