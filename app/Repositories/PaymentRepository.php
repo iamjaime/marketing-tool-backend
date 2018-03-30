@@ -269,7 +269,7 @@ class PaymentRepository
     public function attachProcessingFees($data,$eventTypes){
         if($eventTypes =='invoice.created'){
 
-            $views = $data['object']['amount_due'] / 2; //divide by 2 because 0.02 per view
+            $views = $data['object']['lines']['data'][0]['quantity'];
 
             $invoiceItem = $this->merchant->invoiceItems()->create($data['object']['customer'], [
                 'subscription'=> $data['object']['subscription'],
