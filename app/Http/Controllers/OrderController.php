@@ -226,6 +226,16 @@ class OrderController extends Controller
             ], 400);
         }
 
+        //Validate if the order was filled within the last X amount of hours BUT still has fills remaining.....
+        if($this->order->userAlreadyFilledThisOrderButHasFillsRemaining($this->userId(),$data['order_id'], $data['provider_id'], $data['provider_account_id'])){
+            return response()->json([
+                'success' => false,
+                'data' => [
+                    "job" => ['This order was already filled within the last ' . Config::get('marketingtool.job_fill_times_per_hour') . ' hours']
+                ]
+            ], 400);
+        }
+
 
         //Validate Facebook Post......
         if($data['provider_id'] == 1){

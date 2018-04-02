@@ -154,6 +154,7 @@ class OrderRepository implements OrderRepositoryContract
         $ordersAlreadyFilled = $this->userProvidingService
             ->where('created_at', '>', Carbon::now()->subHours($hoursOffset))
             ->where('providing_service_id', '=', $userProvidingServiceId)
+            ->where('fills_remaining', '=', 0)
             ->select('user_providing_services.order_id')
             ->get();
 
@@ -166,7 +167,42 @@ class OrderRepository implements OrderRepositoryContract
         return $ordersArray;
     }
 
+    /**
+     * Handles getting the orders that have already been filled but have remaining fills left in order to complete the job
+     * by a specific user.
+     *
+     * @param $hoursOffset          How many hours prior was the order filled?
+     * @param $userId               The user who filled the order
+     * @param $providerId           The provider id ( facebook, twitter, instagram etc. )
+     * @param $providerAccountId    The provider account id.
+     * @return mixed
+     */
+    protected function getFilledOrdersWithFillsRemaining($hoursOffset, $userId, $providerId, $providerAccountId)
+    {
+        $accountProvidingService = $this->userAttachedServiceProvider->findByUserIdAndProviderId($userId, $providerId, $providerAccountId);
+        if(!$accountProvidingService){
+            return false;
+        }
+        $userProvidingServiceId = $accountProvidingService->id;
 
+        $ordersArray = [];
+
+        //SELECT * FROM user_providing_services as ups where created_at < timestampadd(hour, -12, now());
+        $ordersAlreadyFilled = $this->userProvidingService
+            ->where('updated_at', '>', Carbon::now()->subHours($hoursOffset))
+            ->where('providing_service_id', '=', $userProvidingServiceId)
+            ->where('fills_remaining', '>', 0)
+            ->select('user_providing_services.order_id')
+            ->get();
+
+        foreach($ordersAlreadyFilled as $order) {
+            if(!in_array($order->order_id, $ordersArray)){
+                array_push($ordersArray, $order->order_id);
+            }
+        }
+
+        return $ordersArray;
+    }
 
 
     /**
@@ -258,6 +294,7 @@ class OrderRepository implements OrderRepositoryContract
     public function userAlreadyFilledThisOrder($fillerId, $orderId, $providerId, $providerAccountId)
     {
         $orders_that_were_filled = $this->getFilledOrders(Config::get('marketingtool.job_limit_per_hour'), $fillerId, $providerId, $providerAccountId);
+
         foreach($orders_that_were_filled as $orderFilled) {
             if($orderFilled == $orderId){
                 return true;
@@ -266,4 +303,28 @@ class OrderRepository implements OrderRepositoryContract
 
         return false;
     }
+
+
+    /**
+     * Handles checking if user already filled an order within X amount of time but still has fills remaining
+     *
+     * @param $fillerId
+     * @param $orderId
+     * @param $providerId
+     * @param $providerAccountId
+     * @return bool
+     */
+    public function userAlreadyFilledThisOrderButHasFillsRemaining($fillerId, $orderId, $providerId, $providerAccountId)
+    {
+        $orders_with_fills_remaining = $this->getFilledOrdersWithFillsRemaining(Config::get('marketingtool.job_fill_times_per_hour'), $fillerId, $providerId, $providerAccountId);
+
+        foreach($orders_with_fills_remaining as $orderFilled) {
+            if($orderFilled == $orderId){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 }
