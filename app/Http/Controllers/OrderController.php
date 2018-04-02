@@ -216,19 +216,30 @@ class OrderController extends Controller
             ], 400);
         }
 
-        //Validate Facebook Post......
-        if($data['provider_id'] == 1){
-
-            $fbPostValidation = $this->userProvidingService->validateFacebookPost($data, $this->userId());
-            if(!$fbPostValidation){
-                return response()->json([
-                    'success' => false,
-                    'data' => [
-                        "job" => ['There is no record of the job being completed.']
-                    ]
-                ], 400);
-            }
+        //Validate if the order was filled within the last X amount of hours.....
+        if($this->order->userAlreadyFilledThisOrder($this->userId(),$data['order_id'], $data['provider_id'], $data['provider_account_id'])){
+            return response()->json([
+                'success' => false,
+                'data' => [
+                    "job" => ['This order was already filled within the last ' . Config::get('marketingtool.job_limit_per_hour') . ' hours']
+                ]
+            ], 400);
         }
+
+
+        //Validate Facebook Post......
+//        if($data['provider_id'] == 1){
+//
+//            $fbPostValidation = $this->userProvidingService->validateFacebookPost($data, $this->userId());
+//            if(!$fbPostValidation){
+//                return response()->json([
+//                    'success' => false,
+//                    'data' => [
+//                        "job" => ['There is no record of the job being completed.']
+//                    ]
+//                ], 400);
+//            }
+//        }
 
 
         //If we pass validation lets fill the order
