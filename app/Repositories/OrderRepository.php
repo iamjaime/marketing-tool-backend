@@ -245,4 +245,25 @@ class OrderRepository implements OrderRepositoryContract
         return true;
     }
 
+
+    /**
+     * Handles checking if user already filled an order within the last X amount of hours
+     *
+     * @param $fillerId
+     * @param $orderId
+     * @param $providerId
+     * @param $providerAccountId
+     * @return bool
+     */
+    public function userAlreadyFilledThisOrder($fillerId, $orderId, $providerId, $providerAccountId)
+    {
+        $orders_that_were_filled = $this->getFilledOrders(Config::get('marketingtool.job_limit_per_hour'), $fillerId, $providerId, $providerAccountId);
+        foreach($orders_that_were_filled as $orderFilled) {
+            if($orderFilled == $orderId){
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
