@@ -93,4 +93,15 @@ class User extends Authenticatable
     {
         return $this->hasMany('App\Models\Company', 'user_id');
     }
+
+
+    /**
+     * Handles getting the logged in user's attached social media networks
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function sub()
+    {
+        return $this->hasMany('App\Models\Payment', 'user_id');
+    }
 }

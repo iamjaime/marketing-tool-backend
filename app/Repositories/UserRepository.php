@@ -187,5 +187,18 @@ class UserRepository implements UserRepositoryContract
 
 
 
+    /**
+     * Handles Finding a user by id
+     *
+     * @param int $id
+     * @return mixed
+     */
+    public function sub($id)
+    {
+        $user = $this->user->where('id', $id)->with(['sub'])->first();
+        return $user;
+    }
+
+
       
 }

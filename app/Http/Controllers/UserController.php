@@ -201,7 +201,19 @@ class UserController extends Controller
     }
 
 
-
+/**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function sub()
+    {
+        $user = $this->user->sub($this->userId());
+        return response()->json([
+            'success' => true,
+            'data' => $user
+        ], 200);
+    }
       
 
 }

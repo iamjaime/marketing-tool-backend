@@ -46,6 +46,8 @@ Route::group(['prefix' => 'v1'], function () {
 
         //User Resource
         Route::get('users', 'UserController@index');
+        //User Resource
+        Route::get('users/sub', 'UserController@sub');
         Route::get('users/{id}', 'UserController@show');
       
         Route::put('users', 'UserController@update'); //Updates the user that is logged in.
