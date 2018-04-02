@@ -133,6 +133,25 @@ class PaymentController extends Controller
 
 
 
+     /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function cancelSubscription(Request $request)
+    {
+        $data = $request->get('data');  
+        $user = $this->payment->cancelSubscription($this->userId(),$data );
+
+        return response()->json([
+            'success' => true,
+            'data' => $user
+        ], 200);
+    }
+
+
+
 
 
       

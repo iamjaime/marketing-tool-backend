@@ -26,8 +26,12 @@ Route::group(['prefix' => 'v1'], function () {
     // stripe
     Route::post('stripe/charge', 'PaymentController@chargeCard');
     Route::post('stripe/plans', 'PaymentController@plans');
+
     Route::post('stripe/webhook', 'PaymentController@webHook');
 
+    Route::post('stripe/credits', 'PaymentController@getCredits');
+    Route::post('stripe/cancelSubscription', 'PaymentController@cancelSubscription');
+    Route::get('users/sub', 'UserController@sub');
 
     //Stats
     Route::get('smi-stats', 'StatController@index');

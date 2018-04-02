@@ -16,6 +16,7 @@ class PaymentRepository
 
     protected $merchant;
     protected $user;
+    protected $Payment;
 
     /**
      * Handles the create charge validation rules.
@@ -55,10 +56,11 @@ class PaymentRepository
     ];
 
 
-    public function __construct(Merchant $merchant, User $user)
+    public function __construct(Merchant $merchant, User $user,Payment $Payment)
     {
         $this->merchant = $merchant;
         $this->user = $user;
+        $this->Payment = $Payment;
     }
 
 
@@ -285,6 +287,26 @@ class PaymentRepository
             }
 
         }
+
+    }
+
+
+    public function cancelSubscription($user_id,$data){
+        
+        $user = $this->user->find($user_id);  
+       
+            $cancel = $this->merchant->subscriptions()->cancel($user->stripe_customer_id ,$data['sub']);
+            
+        
+            $data['status'] = 'canceled';
+           
+          
+            $Payment = $this->Payment->where('id',$data['id'])->first();
+            $Payment->fill($data);
+            $Payment->save();
+         
+        return $Payment;
+        
 
     }
 
