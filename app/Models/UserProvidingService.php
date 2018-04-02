@@ -12,7 +12,7 @@ class UserProvidingService extends Model
      * @var array
      */
     protected $fillable = [
-
+        'language'
     ];
 
 

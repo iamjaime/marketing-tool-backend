@@ -13,6 +13,8 @@ class Order extends Model
      */
     protected $fillable = [
         'quantity',
+        'fill_times',
+        'language',
         'is_complete',
         'progress',
         'url',

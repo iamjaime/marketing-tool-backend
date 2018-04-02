@@ -59,6 +59,52 @@ class UserProvidingServiceRepository implements UserProvidingServiceRepositoryCo
         return $userProvidingService;
     }
 
+    /**
+     * Handles finding if user has provided service
+     *
+     * @param $orderId
+     * @param $providingServiceId
+     * @return mixed
+     */
+    public function userHasProvidedService($orderId, $providingServiceId)
+    {
+        $userProvidingService = $this->userProvidingService->where('order_id', $orderId)->where('providing_service_id', $providingServiceId)->where('fills_remaining', '!=', 0)->first();
+        return $userProvidingService;
+    }
+
+
+    /**
+     * Handles the funds distributions when a job is completed
+     *
+     * @param $user_id  The user id that will receive the funds
+     * @param $remainingToFill  The order quantity amount remaining to be filled
+     * @return mixed  The amount of credits received by user for filling the order.
+     */
+    private function distributeFunds($user_id, $remainingToFill)
+    {
+        $creditsInDollars = $remainingToFill * Config::get('marketingtool.net_worth');
+        $userCredits = $creditsInDollars * 100;
+
+
+        $systemCreditsInDollars = $remainingToFill * Config::get('marketingtool.system_commission');
+        $systemCredits = $systemCreditsInDollars * 100;
+
+
+        //Lets get the pool credits from the system credits.....
+        $poolCredits = $systemCredits * Config::get('marketingtool.smi_pool');
+
+
+        //deduct from system credits and append to pool credits
+        $systemCredits = $systemCredits - $poolCredits;
+
+        //now we can send ourselves the system commission
+        $this->user->addCredits(Config::get('marketingtool.admin_account_id'), $systemCredits);
+        $this->user->addCredits(Config::get('marketingtool.smi_pool_account_id'), $poolCredits);
+        $this->user->addCredits($user_id, $userCredits);
+
+        return $userCredits;
+    }
+
 
     /**
      * Handles creating new user providing service
@@ -76,6 +122,7 @@ class UserProvidingServiceRepository implements UserProvidingServiceRepositoryCo
         }
 
         $order = $this->order->where('id', '=', $data['order_id'])->first();
+        $fillTimes = $order->fill_times;
 
         //get the amount of views that we need.
         $remainingToFill = $this->getTrafficBalance($order);
@@ -83,88 +130,216 @@ class UserProvidingServiceRepository implements UserProvidingServiceRepositoryCo
         //get the amount of traffic that we can fill with this social account.
         $myTraffic = $socialAccount->traffic;
 
-        if($myTraffic >= $remainingToFill){
-            //we have enough traffic to fill the order....
-            $creditsInDollars = $remainingToFill * Config::get('marketingtool.net_worth');
-            $userCredits = $creditsInDollars * 100;
+        /*
+         * First Check if we have already filled this order....
+         * */
+        $userProvidingServiceData = $this->userHasProvidedService($order->id, $socialAccount->id);
+
+        if($fillTimes > 1){
+            //This order needs to be filled more then 1 time....
+
+            if($userProvidingServiceData){
+                //The order has already been filled at least once
+                $fillsRemaining = $userProvidingServiceData->fills_remaining;
+
+                if($myTraffic >= $remainingToFill){
+
+                    //we have enough traffic to fill the order....
+                    if($fillsRemaining <= 1){
+                        //Release the funds...
+                        $userCredits = $this->distributeFunds($user_id, $remainingToFill);
+                        //Now update the record....
+                        $userProvidingServiceData->traffic_provided = $userProvidingServiceData->traffic_provided + $socialAccount->traffic;
+                        $userProvidingServiceData->credits_paid = $userCredits;
+                        $userProvidingServiceData->fills_remaining = $fillsRemaining - 1;
+                        $userProvidingServiceData->save();
+
+                        //now we need to update the progress of the order....
+                        $progress = $order->progress + $remainingToFill;
+                        $order->progress = $progress;
+                        $order->is_complete = true;
+                        $order->save();
+                    }else{
+                        //Don't distribute funds because they still have fillsRemaining
+                        //update the record....
+                        $userProvidingServiceData->traffic_provided = $userProvidingServiceData->traffic_provided + $socialAccount->traffic;
+                        $userProvidingServiceData->fills_remaining = $fillsRemaining - 1;
+                        $userProvidingServiceData->save();
+                    }
+
+                    return $userProvidingServiceData;
+
+                }else{
+                    //my traffic isn't enough to fill the order....
+                    if($fillsRemaining <= 1){
+
+                        //Release the funds...
+                        $userCredits = $this->distributeFunds($user_id, $myTraffic);
+
+                        //Now update the record....
+                        $userProvidingServiceData->traffic_provided = $userProvidingServiceData->traffic_provided + $socialAccount->traffic;
+                        $userProvidingServiceData->credits_paid = $userCredits;
+                        $userProvidingServiceData->fills_remaining = $fillsRemaining - 1;
+                        $userProvidingServiceData->save();
+
+                        //now we need to update the progress of the order....
+                        $progress = $order->progress + $myTraffic;
+                        $order->progress = $progress;
+
+                        if($progress >= $order->quantity){
+                            $order->is_complete = true;
+                        }
+                        $order->save();
+
+                    }else{
+                        //Don't distribute funds because they still have fillsRemaining
+                        //update the record....
+                        $userProvidingServiceData->traffic_provided = $userProvidingServiceData->traffic_provided + $socialAccount->traffic;
+                        $userProvidingServiceData->fills_remaining = $fillsRemaining - 1;
+                        $userProvidingServiceData->save();
+                    }
+
+                    return $userProvidingServiceData;
+
+                }
+
+            }else{
+                //This is the first time filling the order 1 out of X amount....
+                //Make a new record.....
+                $fillsRemaining = $order->fill_times;
+
+                if($myTraffic >= $remainingToFill){
+                    //we have enough traffic to fill the order....
+
+                    if($fillsRemaining <= 1){
+                        //Release The Funds....
+                        $userCredits = $this->distributeFunds($user_id, $remainingToFill);
+
+                        //Create new user providing service record....
+                        $this->userProvidingService = new UserProvidingService();
+                        $this->userProvidingService->order_id = $order->id;
+                        $this->userProvidingService->providing_service_id = $socialAccount->id;
+                        $this->userProvidingService->buying_service_user_id = $order->user_id;
+                        $this->userProvidingService->traffic_provided = $socialAccount->traffic;
+                        $this->userProvidingService->credits_paid = $userCredits;
+                        $this->userProvidingService->fills_remaining = $fillsRemaining - 1;
+                        $this->userProvidingService->save();
+
+                        //now we need to update the progress of the order....
+                        $progress = $order->progress + $remainingToFill;
+                        $order->progress = $progress;
+                        $order->is_complete = true;
+                        $order->save();
+                    }else{
+                        //Don't distribute funds because they still have fillsRemaining
+                        //Create new user providing service record....
+                        $this->userProvidingService = new UserProvidingService();
+                        $this->userProvidingService->order_id = $order->id;
+                        $this->userProvidingService->providing_service_id = $socialAccount->id;
+                        $this->userProvidingService->buying_service_user_id = $order->user_id;
+                        $this->userProvidingService->traffic_provided = $socialAccount->traffic;
+                        $this->userProvidingService->credits_paid = 0;
+                        $this->userProvidingService->fills_remaining = $fillsRemaining - 1;
+                        $this->userProvidingService->save();
+                    }
 
 
-            $systemCreditsInDollars = $remainingToFill * Config::get('marketingtool.system_commission');
-            $systemCredits = $systemCreditsInDollars * 100;
+                    return $this->userProvidingService;
 
+                }else{
+                    //my traffic isn't enough to fill the order....
+                    if($fillsRemaining <= 1) {
+                        //Release the funds...
+                        $userCredits = $this->distributeFunds($user_id, $myTraffic);
 
-            //Lets get the pool credits from the system credits.....
-            $poolCredits = $systemCredits * Config::get('marketingtool.smi_pool');
+                        $this->userProvidingService = new UserProvidingService();
+                        $this->userProvidingService->order_id = $order->id;
+                        $this->userProvidingService->providing_service_id = $socialAccount->id;
+                        $this->userProvidingService->buying_service_user_id = $order->user_id;
+                        $this->userProvidingService->traffic_provided = $socialAccount->traffic;
+                        $this->userProvidingService->credits_paid = $userCredits;
+                        $this->userProvidingService->fills_remaining = $fillsRemaining - 1;
+                        $this->userProvidingService->save();
 
+                        //now we need to update the progress of the order....
+                        $progress = $order->progress + $myTraffic;
+                        $order->progress = $progress;
 
-            //deduct from system credits and append to pool credits
-            $systemCredits = $systemCredits - $poolCredits;
+                        if($progress >= $order->quantity){
+                            $order->is_complete = true;
+                        }
 
-            //now we can send ourselves the system commission
-            $this->user->addCredits(Config::get('marketingtool.admin_account_id'), $systemCredits);
-            $this->user->addCredits(Config::get('marketingtool.smi_pool_account_id'), $poolCredits);
-            $this->user->addCredits($user_id, $userCredits);
+                        $order->save();
+                    }else{
+                        //Don't distribute funds because they still have fillsRemaining
+                        //Create new user providing service record....
+                        $this->userProvidingService = new UserProvidingService();
+                        $this->userProvidingService->order_id = $order->id;
+                        $this->userProvidingService->providing_service_id = $socialAccount->id;
+                        $this->userProvidingService->buying_service_user_id = $order->user_id;
+                        $this->userProvidingService->traffic_provided = $socialAccount->traffic;
+                        $this->userProvidingService->credits_paid = 0;
+                        $this->userProvidingService->fills_remaining = $fillsRemaining - 1;
+                        $this->userProvidingService->save();
+                    }
 
-
-            $this->userProvidingService = new UserProvidingService();
-            $this->userProvidingService->order_id = $order->id;
-            $this->userProvidingService->providing_service_id = $socialAccount->id;
-            $this->userProvidingService->buying_service_user_id = $order->user_id;
-            $this->userProvidingService->traffic_provided = $socialAccount->traffic;
-            $this->userProvidingService->credits_paid = $userCredits;
-            $this->userProvidingService->save();
-
-            //now we need to update the progress of the order....
-            $progress = $order->progress + $remainingToFill;
-            $order->progress = $progress;
-            $order->is_complete = true;
-            $order->save();
-
-
-            return $this->userProvidingService;
-        }else{
-            //my traffic isn't enough to fill the order....
-            $creditsInDollars = $myTraffic * Config::get('marketingtool.net_worth');
-            $userCredits = $creditsInDollars * 100;
-
-            $systemCreditsInDollars = $myTraffic * Config::get('marketingtool.system_commission');
-            $systemCredits = $systemCreditsInDollars * 100;
-
-            //Lets get the pool credits from the system credits.....
-            $poolCredits = $systemCredits * Config::get('marketingtool.smi_pool');
-
-            //deduct from system credits and append to pool credits
-            $systemCredits = $systemCredits - $poolCredits;
-
-
-            //now we can send ourselves the system commission
-            $this->user->addCredits(Config::get('marketingtool.admin_account_id'), $systemCredits);
-            $this->user->addCredits(Config::get('marketingtool.smi_pool_account_id'), $poolCredits);
-            $this->user->addCredits($user_id, $userCredits);
-
-            $this->userProvidingService = new UserProvidingService();
-            $this->userProvidingService->order_id = $order->id;
-            $this->userProvidingService->providing_service_id = $socialAccount->id;
-            $this->userProvidingService->buying_service_user_id = $order->user_id;
-            $this->userProvidingService->traffic_provided = $socialAccount->traffic;
-            $this->userProvidingService->credits_paid = $userCredits;
-            $this->userProvidingService->save();
-
-            //now we need to update the progress of the order....
-            $progress = $order->progress + $myTraffic;
-            $order->progress = $progress;
-
-            if($progress >= $order->quantity){
-                $order->is_complete = true;
+                    return $this->userProvidingService;
+                }
             }
 
-            $order->save();
+        }else{
+            //This order only needs to be filled 1 time....
+            if($myTraffic >= $remainingToFill){
 
-            return $this->userProvidingService;
+                //we have enough traffic to fill the order....
+                $userCredits = $this->distributeFunds($user_id, $remainingToFill);
+
+                $this->userProvidingService = new UserProvidingService();
+                $this->userProvidingService->order_id = $order->id;
+                $this->userProvidingService->providing_service_id = $socialAccount->id;
+                $this->userProvidingService->buying_service_user_id = $order->user_id;
+                $this->userProvidingService->traffic_provided = $socialAccount->traffic;
+                $this->userProvidingService->credits_paid = $userCredits;
+                $this->userProvidingService->save();
+
+                //now we need to update the progress of the order....
+                $progress = $order->progress + $remainingToFill;
+                $order->progress = $progress;
+                $order->is_complete = true;
+                $order->save();
+
+
+                return $this->userProvidingService;
+            }else{
+                //my traffic isn't enough to fill the order....
+                $userCredits = $this->distributeFunds($user_id, $myTraffic);
+
+                $this->userProvidingService = new UserProvidingService();
+                $this->userProvidingService->order_id = $order->id;
+                $this->userProvidingService->providing_service_id = $socialAccount->id;
+                $this->userProvidingService->buying_service_user_id = $order->user_id;
+                $this->userProvidingService->traffic_provided = $socialAccount->traffic;
+                $this->userProvidingService->credits_paid = $userCredits;
+                $this->userProvidingService->save();
+
+                //now we need to update the progress of the order....
+                $progress = $order->progress + $myTraffic;
+                $order->progress = $progress;
+
+                if($progress >= $order->quantity){
+                    $order->is_complete = true;
+                }
+
+                $order->save();
+
+                return $this->userProvidingService;
+            }
         }
 
         return false;
     }
+
+
 
 
     /**
