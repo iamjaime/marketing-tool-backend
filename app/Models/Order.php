@@ -18,6 +18,9 @@ class Order extends Model
         'is_complete',
         'progress',
         'url',
+        'image_url',
+        'title',
+        'description',
         'latitude',
         'longitude'
     ];
