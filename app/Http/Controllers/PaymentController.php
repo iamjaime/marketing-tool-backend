@@ -11,10 +11,12 @@ class PaymentController extends Controller
 {
 
     protected $payment;
+    protected $user;
 
-    public function __construct(Payment $payment)
+    public function __construct(Payment $payment, User $user)
     {
         $this->payment = $payment;
+        $this->user = $user;
     }
 
     /**
@@ -86,6 +88,12 @@ class PaymentController extends Controller
         if($stripeCustomer->stripe_customer_id){
 
             $payment = $this->payment->subscribe($this->userId(), $data);
+
+            //Everything was successful....Now add the credits....
+            if($payment->status == "active"){
+                $this->user->addCredits($this->userId(), $payment->meta_data->quantity);
+            }
+
             return response()->json([
                 'success' => true,
                 'data' => $payment
@@ -122,7 +130,7 @@ class PaymentController extends Controller
                  'data' => $validator
              ], 400);
          }
-  
+
         $fees = $this->payment->attachProcessingFees($data, $eventType);
 
         return response()->json([
