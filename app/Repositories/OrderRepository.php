@@ -272,8 +272,8 @@ class OrderRepository implements OrderRepositoryContract
 
 
         //format the subscription dates....
-        $data['subscription_begin_date'] = Carbon::parse($data['subscription_begin_date'])->format("Y-m-d H:i:s");
-        $data['subscription_end_date'] = Carbon::parse($data['subscription_end_date'])->format("Y-m-d H:i:s");
+        $data['subscription_begin_date'] = Carbon::createFromFormat("U", $data['subscription_begin_date'])->format("Y-m-d H:i:s");
+        $data['subscription_end_date'] = Carbon::createFromFormat("U", $data['subscription_end_date'])->format("Y-m-d H:i:s");
 
         $autoJobData = [
             'order_id' => $this->order->id,
