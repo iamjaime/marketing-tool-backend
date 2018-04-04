@@ -24,6 +24,8 @@ class AutomaticJobRepository
     public function create($data)
     {
         $job = new AutomaticJob();
+        $job->order_id = $data['order_id'];
+        $job->subscription_payment_id = $data['subscription_payment_id'];
         $job->fill($data);
         $job->save();
     }
