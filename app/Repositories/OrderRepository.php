@@ -298,8 +298,8 @@ class OrderRepository implements OrderRepositoryContract
      */
     protected function getDaysBetweenSubscription($beginDate, $endDate)
     {
-        $theBeginning = Carbon::parse($beginDate);
-        $theEnd = Carbon::parse($endDate);
+        $theBeginning = Carbon::createFromTimestamp($beginDate);
+        $theEnd = Carbon::createFromTimestamp($endDate);
 
         return $theBeginning->diffInDays($theEnd);
     }
