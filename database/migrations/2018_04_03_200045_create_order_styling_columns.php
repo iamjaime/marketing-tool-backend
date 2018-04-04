@@ -14,7 +14,8 @@ class CreateOrderStylingColumns extends Migration
     public function up()
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->string('image_url')->after('url')->nullable();
+            $table->string('target_url')->after('url')->nullable();
+            $table->string('image_url')->after('target_url')->nullable();
             $table->string('title')->after('image_url')->nullable();
             $table->string('description')->after('title')->nullable();
         });
@@ -28,6 +29,7 @@ class CreateOrderStylingColumns extends Migration
     public function down()
     {
         Schema::table('orders', function($table) {
+            $table->dropColumn('target_url');
             $table->dropColumn('image_url');
             $table->dropColumn('title');
             $table->dropColumn('description');

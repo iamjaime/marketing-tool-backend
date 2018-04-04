@@ -17,6 +17,7 @@ class Order extends Model
         'language',
         'is_complete',
         'progress',
+        'targret_url',
         'url',
         'image_url',
         'title',
