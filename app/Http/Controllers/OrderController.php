@@ -7,6 +7,7 @@ use App\Repositories\OrderRepository as Order;
 use App\Repositories\UserProvidingServiceRepository as UserProvidingService;
 use App\Repositories\UserRepository as User;
 use Illuminate\Support\Facades\Config;
+use Jenssegers\Agent\Agent;
 
 class OrderController extends Controller
 {
@@ -282,5 +283,29 @@ class OrderController extends Controller
             'success' => true,
             'data' => number_format($pool, 2)
         ], 200);
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function orderStyle($id)
+    {
+        $order = $this->order->find($id);
+        $agent = new Agent();
+
+        $output['order'] = $order;
+        $output['agent'] = $agent;
+
+        //If we have instagram page share....
+        if(strpos($order->url, 'https://www.instagram.com/') !== false){
+            $boom = explode('/', $order->url);
+            $instagramUsername = $boom[3];
+            $output['instagram_username'] = $instagramUsername;
+        }
+
+        return view('facebook.smi_fb_share_order_style', $output);
     }
 }

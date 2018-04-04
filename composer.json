@@ -7,13 +7,14 @@
     "require": {
         "php": ">=7.0.0",
         "barryvdh/laravel-cors": "^0.10.0",
+        "cartalyst/stripe-laravel": "7.0.*",
         "fideloper/proxy": "~3.3",
         "guzzlehttp/guzzle": "^6.3",
+        "jenssegers/agent": "^2.6",
         "laravel/framework": "5.5.*",
         "laravel/passport": "^4.0",
         "laravel/tinker": "~1.0",
         "sammyk/laravel-facebook-sdk": "^3.5",
-        "cartalyst/stripe-laravel": "7.0.*",
         "webpatser/laravel-countries": "dev-master"
     },
     "require-dev": {
