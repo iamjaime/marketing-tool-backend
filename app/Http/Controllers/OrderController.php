@@ -116,7 +116,11 @@ class OrderController extends Controller
         }
 
         //If we pass validation lets create user and output success :)
-        $order = $this->order->create($this->userId(), $data);
+        if($data['automatic']){
+            $order = $this->order->createOneOrderAndAutomateTheRest($this->userId(), $data);
+        }else{
+            $order = $this->order->create($this->userId(), $data);
+        }
 
         return response()->json([
             'success' => true,

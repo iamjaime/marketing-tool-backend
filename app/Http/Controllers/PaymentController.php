@@ -6,17 +6,20 @@ use Illuminate\Http\Request;
 
 use App\Repositories\PaymentRepository as Payment;
 use App\Repositories\UserRepository as User;
+use App\Repositories\OrderRepository as Order;
 
 class PaymentController extends Controller
 {
 
     protected $payment;
     protected $user;
+    protected $order;
 
-    public function __construct(Payment $payment, User $user)
+    public function __construct(Payment $payment, User $user, Order $order)
     {
         $this->payment = $payment;
         $this->user = $user;
+        $this->order = $order;
     }
 
     /**

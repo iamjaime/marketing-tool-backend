@@ -75,4 +75,13 @@ class Order extends Model
     {
         return $this->hasMany('App\Models\UserProvidingService');
     }
+
+    /**
+     * Handles getting the automatic job associated with this order
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function autoJob()
+    {
+        return $this->hasOne('App\Models\AutomaticJob', 'id', 'subscription_payment_id');
+    }
 }

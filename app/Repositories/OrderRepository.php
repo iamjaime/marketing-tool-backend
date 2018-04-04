@@ -11,6 +11,7 @@ use App\Repositories\UserAttachedServiceProviderRepository as UserAttachedServic
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Models\UserProvidingService;
+use App\Repositories\AutomaticJobRepository;
 
 class OrderRepository implements OrderRepositoryContract
 {
@@ -20,6 +21,7 @@ class OrderRepository implements OrderRepositoryContract
     protected $user;
     protected $userAttachedServiceProvider;
     protected $userProvidingService;
+    protected $autoJob;
 
     /**
      * Handles the create new order validation rules.
@@ -28,7 +30,12 @@ class OrderRepository implements OrderRepositoryContract
     public $create_rules = [
         'service_provider_id' => 'required|exists:service_providers,id',
         'service_id' => 'required|exists:services,id',
-        'quantity' => 'required'
+        'quantity' => 'required',
+        'automatic' => 'required|boolean',
+        'subscription_id' => 'required_if:automatic,true',
+        'subscription_payment_id' => 'required_if:automatic,true',
+        'subscription_begin_date' => 'required_if:automatic,true',
+        'subscription_end_date' => 'required_if:automatic,true'
     ];
 
     /**
@@ -43,12 +50,13 @@ class OrderRepository implements OrderRepositoryContract
     ];
 
 
-    public function __construct(Order $order, ServiceProvider $serviceProvider, User $user, UserAttachedServiceProvider $userAttachedServiceProviderRepository, UserProvidingService $userProvidingService){
+    public function __construct(Order $order, ServiceProvider $serviceProvider, User $user, UserAttachedServiceProvider $userAttachedServiceProviderRepository, UserProvidingService $userProvidingService, AutomaticJobRepository $automaticJobRepository){
         $this->order = $order;
         $this->serviceProvider = $serviceProvider;
         $this->user = $user;
         $this->userAttachedServiceProvider = $userAttachedServiceProviderRepository;
         $this->userProvidingService = $userProvidingService;
+        $this->autoJob = $automaticJobRepository;
     }
 
     /**
@@ -59,7 +67,7 @@ class OrderRepository implements OrderRepositoryContract
      */
     public function find($id)
     {
-        $order = $this->order->where('id', $id)->first();
+        $order = $this->order->where('id', $id)->with('autoJobs')->first();
         return $order;
     }
 
@@ -231,6 +239,71 @@ class OrderRepository implements OrderRepositoryContract
 
         return $this->order;
     }
+
+
+    /**
+     * Handles Creating the initial subscription order and automating the rest
+     *
+     * @param $user_id
+     * @param array $data
+     * @return Order
+     */
+    public function createOneOrderAndAutomateTheRest($user_id, array $data)
+    {
+        //first we need to get the number of days between the beginning of the subscription
+        //and the ending of the subscription
+        $days = $this->getDaysBetweenSubscription($data['subscription_begin_date'], $data['subscription_end_date']);
+        //then we need to divide the total order quantity by the number above.....
+        $dailyViews = $data['quantity'] / floor($days);
+
+        $costInCredits = $this->getCreditsNeeded($dailyViews);
+
+        //now lets deduct the total cost from the purchaser's account....
+        $this->user->deductCredits($user_id, $costInCredits);
+
+        $this->order = new Order();
+        $this->order->fill($data);
+        $this->order->user_id = $user_id;
+        $this->order->subscription_payment_id = $data['subscription_payment_id'];
+        $this->order->service_provider_id = $data['service_provider_id'];
+        $this->order->service_id = $data['service_id'];
+        $this->order->total_cost = $costInCredits;
+        $this->order->save();
+
+
+        //format the subscription dates....
+        $data['subscription_begin_date'] = Carbon::parse($data['subscription_begin_date'])->format("Y-m-d H:i:s");
+        $data['subscription_end_date'] = Carbon::parse($data['subscription_end_date'])->format("Y-m-d H:i:s");
+
+        $autoJobData = [
+            'order_id' => $this->order->id,
+            'subscription_payment_id' => $data['subscription_payment_id'],
+            'days_remaining' => $days,
+            'begin_date' => $data['subscription_begin_date'],
+            'end_date' => $data['subscription_end_date']
+        ];
+
+        $this->autoJob->create($autoJobData);
+
+        return $this->order;
+    }
+
+
+    /**
+     * Handles getting the amount of days from beginning to end of subscription
+     *
+     * @param $beginDate
+     * @param $endDate
+     * @return int
+     */
+    protected function getDaysBetweenSubscription($beginDate, $endDate)
+    {
+        $theBeginning = Carbon::parse($beginDate);
+        $theEnd = Carbon::parse($endDate);
+
+        return $theBeginning->diffInDays($theEnd);
+    }
+
 
     /**
      * Handles getting the credits needed
