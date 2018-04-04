@@ -300,8 +300,8 @@ class OrderController extends Controller
         $output['agent'] = $agent;
 
         //If we have instagram page share....
-        if(strpos($order->url, 'https://www.instagram.com/') !== false){
-            $boom = explode('/', $order->url);
+        if(strpos($order->target_url, 'https://www.instagram.com/') !== false){
+            $boom = explode('/', $order->target_url);
             $instagramUsername = $boom[3];
             $output['instagram_username'] = $instagramUsername;
         }

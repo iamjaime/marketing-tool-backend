@@ -26,7 +26,7 @@
     @endisset
 
     @unless($instagram_username)
-        window.location('{{ $order->url }}');
+        window.location('{{ $order->target_url }}');
     @endunless
 </script>
 
