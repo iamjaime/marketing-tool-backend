@@ -67,7 +67,7 @@ class OrderRepository implements OrderRepositoryContract
      */
     public function find($id)
     {
-        $order = $this->order->where('id', $id)->with('autoJobs')->first();
+        $order = $this->order->where('id', $id)->with('autoJob')->first();
         return $order;
     }
 
