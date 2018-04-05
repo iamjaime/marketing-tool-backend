@@ -278,7 +278,7 @@ class OrderRepository implements OrderRepositoryContract
         $autoJobData = [
             'order_id' => $this->order->id,
             'subscription_payment_id' => $data['subscription_payment_id'],
-            'days_remaining' => $days,
+            'days_remaining' => $days - 1, //deduct the order we already created for today.
             'begin_date' => $data['subscription_begin_date'],
             'end_date' => $data['subscription_end_date']
         ];

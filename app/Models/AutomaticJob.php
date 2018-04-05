@@ -26,6 +26,16 @@ class AutomaticJob extends Model
      */
     public function subscription()
     {
-        return $this->hasOne('App\Models\Payment', 'subscription_payment_id');
+        return $this->hasOne('App\Models\Payment', 'id', 'subscription_payment_id');
+    }
+
+    /**
+     * Handles getting the order attached to this record
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function order()
+    {
+        return $this->hasOne('App\Models\Order', 'id', 'order_id');
     }
 }

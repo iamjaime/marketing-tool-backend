@@ -7,12 +7,10 @@ use App\Models\AutomaticJob;
 class AutomaticJobRepository
 {
 
-    protected $autoJob;
 
-
-    public function __construct(AutomaticJob $automaticJob)
+    public function __construct()
     {
-        $this->autoJob = $automaticJob;
+
     }
 
 

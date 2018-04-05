@@ -179,7 +179,7 @@ return [
         SammyK\LaravelFacebookSdk\LaravelFacebookSdkServiceProvider::class,
         Cartalyst\Stripe\Laravel\StripeServiceProvider::class,
         App\Providers\CountryServiceProvider::class,
-        Jenssegers\Agent\AgentServiceProvider::class,
+        Jenssegers\Agent\AgentServiceProvider::class
 
     ],
 
