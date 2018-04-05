@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\AutomaticJob as AutoJob;
 use App\Models\Order as Order;
+use App\Models\User;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Console\Command;
 
@@ -27,16 +28,19 @@ class AutoJobs extends Command
 
     protected $order;
 
+    protected $user;
+
     /**
      * Create a new command instance.
      *
      * @return mixed
      */
-    public function __construct(AutoJob $automaticJob, Order $order)
+    public function __construct(AutoJob $automaticJob, Order $order, User $user)
     {
         parent::__construct();
         $this->autoJob = $automaticJob;
         $this->order = $order;
+        $this->user = $user;
     }
 
     /**
@@ -61,6 +65,10 @@ class AutoJobs extends Command
             $quantity = $job->order->quantity;
 
             $costInCredits = $this->getCreditsNeeded($quantity);
+
+            $user = $this->user->find($job->order->user_id);
+            $user->credits = ($user->credits - $costInCredits);
+            $user->save();
 
             $order = new Order();
             $order->fill($job->order->toArray());
