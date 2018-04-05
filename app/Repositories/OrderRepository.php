@@ -263,6 +263,7 @@ class OrderRepository implements OrderRepositoryContract
 
         $this->order = new Order();
         $this->order->fill($data);
+        $this->order->quantity = $dailyViews;
         $this->order->user_id = $user_id;
         $this->order->subscription_payment_id = $data['subscription_payment_id'];
         $this->order->service_provider_id = $data['service_provider_id'];
