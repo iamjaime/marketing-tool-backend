@@ -14,7 +14,7 @@ class Order extends Model
     protected $fillable = [
         'quantity',
         'is_a_local_job',
-        'job_radius',
+        'radius',
         'fill_times',
         'language',
         'is_complete',
