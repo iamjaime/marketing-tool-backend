@@ -94,7 +94,8 @@ class PaymentController extends Controller
 
             //Everything was successful....Now add the credits....
             if($payment->status == "active"){
-                $this->user->addCredits($this->userId(), $payment['meta_data']['quantity']);
+                $credits = $this->order->getCreditsNeeded($payment['meta_data']['quantity']);
+                $this->user->addCredits($this->userId(), $credits);
             }
 
             return response()->json([
