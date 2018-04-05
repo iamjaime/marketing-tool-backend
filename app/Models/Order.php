@@ -13,6 +13,7 @@ class Order extends Model
      */
     protected $fillable = [
         'quantity',
+        'is_a_local_job',
         'fill_times',
         'language',
         'is_complete',
