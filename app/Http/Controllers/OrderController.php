@@ -312,4 +312,34 @@ class OrderController extends Controller
 
         return view('facebook.smi_fb_share_order_style', $output);
     }
+
+
+    /**
+     * Display the specified resource
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function localOrders(Request $request)
+    {
+        $data = $request->get('data');
+
+        //validate....
+        $rules = $this->order->local_rules;
+        $validator = $this->validate($request, $rules);
+
+        if(!empty($validator)){
+            return response()->json([
+                'success' => false,
+                'data' => $validator
+            ], 400);
+        }
+
+        $isComplete = false; //is the order complete OR is the order still in progress?
+        $order = $this->order->findNearby($data['latitude'], $data['longitude'], $data['distance'], $isComplete);
+        return response()->json([
+            'success' => true,
+            'data' => $order
+        ], 200);
+    }
 }

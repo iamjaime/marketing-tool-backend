@@ -75,6 +75,10 @@ Route::group(['prefix' => 'v1'], function () {
 
         Route::get('orders/{id}', 'OrderController@show');
 
+
+        Route::post('local-orders', 'OrderController@localOrders');
+
+
         //Companies Resource
         Route::resource('company', 'CompanyController', ['only' => ['show', 'store', 'update', 'destroy']]);
 
