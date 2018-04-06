@@ -330,10 +330,17 @@ class OrderController extends Controller
         if(!$per_page){ $per_page = 10; }
 
         $isComplete = false; //is the order complete OR is the order still in progress?
-        $order = $this->order->findNearby($lat, $lng, $distance, $isComplete)->paginate($per_page);
+        $orders = $this->order->findNearby($lat, $lng, $distance, $isComplete)->paginate($per_page)->toArray();
+
+        foreach($orders['data'] as $key => $order) {
+            if($order['distance'] > $order['radius']){
+                unset($orders['data'][$key]);
+            }
+        }
+
         return response()->json([
             'success' => true,
-            'data' => $order
+            'data' => $orders
         ], 200);
     }
 }

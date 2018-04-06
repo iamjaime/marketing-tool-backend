@@ -89,6 +89,18 @@ class Order extends Model
 
 
     /**
+     * Convert the radius from meters to miles
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public function getRadiusAttribute($value)
+    {
+        return $value * 0.000621371192;
+    }
+
+
+    /**
      * Handles checking if within max distance
      *
      * @param $query
@@ -108,7 +120,7 @@ class Order extends Model
                     + sin(radians(" . $lat . ")) 
                     * sin(radians(`latitude`))))";
 
-        return $query->select('id', 'user_id')
+        return $query->select('*')
             ->selectRaw("{$haversine} AS distance")
             ->whereRaw("{$haversine} < ?", [$radius]);
     }
