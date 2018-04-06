@@ -76,7 +76,7 @@ Route::group(['prefix' => 'v1'], function () {
         Route::get('orders/{id}', 'OrderController@show');
 
 
-        Route::post('local-orders', 'OrderController@localOrders');
+        Route::get('local-orders', 'OrderController@localOrders');
 
 
         //Companies Resource

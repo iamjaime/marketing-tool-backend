@@ -89,7 +89,7 @@ class OrderRepository implements OrderRepositoryContract
      */
     public function findNearby($lat, $lng, $distance = 5, $isComplete = false)
     {
-        return $this->order->where('is_complete', $isComplete)->where('is_a_local_job', true)->isWithinMaxDistance($lat, $lng, $distance)->get();
+        return $this->order->where('is_complete', $isComplete)->where('is_a_local_job', true)->isWithinMaxDistance($lat, $lng, $distance);
     }
 
     /**

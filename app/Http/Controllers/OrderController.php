@@ -322,21 +322,15 @@ class OrderController extends Controller
      */
     public function localOrders(Request $request)
     {
-        $data = $request->get('data');
+        $lat = $request->get('lat');
+        $lng = $request->get('lng');
+        $distance = $request->get('distance');
+        $per_page = $request->get('per_page');
 
-        //validate....
-        $rules = $this->order->local_rules;
-        $validator = $this->validate($request, $rules);
-
-        if(!empty($validator)){
-            return response()->json([
-                'success' => false,
-                'data' => $validator
-            ], 400);
-        }
+        if(!$per_page){ $per_page = 10; }
 
         $isComplete = false; //is the order complete OR is the order still in progress?
-        $order = $this->order->findNearby($data['latitude'], $data['longitude'], $data['distance'], $isComplete);
+        $order = $this->order->findNearby($lat, $lng, $distance, $isComplete)->paginate($per_page);
         return response()->json([
             'success' => true,
             'data' => $order
