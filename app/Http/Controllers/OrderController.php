@@ -332,11 +332,18 @@ class OrderController extends Controller
         $isComplete = false; //is the order complete OR is the order still in progress?
         $orders = $this->order->findNearby($lat, $lng, $distance, $isComplete)->paginate($per_page)->toArray();
 
+        $data  = [];
+
         foreach($orders['data'] as $key => $order) {
             if($order['distance'] > $order['radius']){
                 unset($orders['data'][$key]);
+            } else{
+                array_push($data, $order);
             }
         }
+
+        $orders['data'] = $data;
+
 
         return response()->json([
             'success' => true,
