@@ -49,6 +49,13 @@ class OrderRepository implements OrderRepositoryContract
         'is_complete' => 'sometimes|required'
     ];
 
+    public $local_rules = [
+        'latitude' => 'required',
+        'longitude' => 'required',
+        'distance' => 'required',
+//        'units' => 'required', //km or miles
+    ];
+
 
     public function __construct(Order $order, ServiceProvider $serviceProvider, User $user, UserAttachedServiceProvider $userAttachedServiceProviderRepository, UserProvidingService $userProvidingService, AutomaticJobRepository $automaticJobRepository){
         $this->order = $order;
@@ -69,6 +76,20 @@ class OrderRepository implements OrderRepositoryContract
     {
         $order = $this->order->where('id', $id)->with('autoJob')->first();
         return $order;
+    }
+
+    /**
+     * Handles finding the nearby orders
+     *
+     * @param $lat
+     * @param $lng
+     * @param $distance
+     * @param $isComplete
+     * @return mixed
+     */
+    public function findNearby($lat, $lng, $distance = 5, $isComplete = false)
+    {
+        return $this->order->where('is_complete', $isComplete)->where('is_a_local_job', true)->isWithinMaxDistance($lat, $lng, $distance)->get();
     }
 
     /**

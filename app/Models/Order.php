@@ -86,4 +86,31 @@ class Order extends Model
     {
         return $this->hasOne('App\Models\AutomaticJob', 'id', 'subscription_payment_id');
     }
+
+
+    /**
+     * Handles checking if within max distance
+     *
+     * @param $query
+     * @param $lat
+     * @param $lng
+     * @param int $radius
+     * @return mixed
+     */
+    public function scopeIsWithinMaxDistance($query, $lat, $lng, $radius = 5) {
+        //$units = 6371; //km
+        $units = 3959; //miles
+
+        $haversine = "(".$units." * acos(cos(radians(" . $lat . ")) 
+                    * cos(radians(`latitude`)) 
+                    * cos(radians(`longitude`) 
+                    - radians(" . $lng . ")) 
+                    + sin(radians(" . $lat . ")) 
+                    * sin(radians(`latitude`))))";
+
+        return $query->select('id', 'user_id')
+            ->selectRaw("{$haversine} AS distance")
+            ->whereRaw("{$haversine} < ?", [$radius]);
+    }
+
 }
