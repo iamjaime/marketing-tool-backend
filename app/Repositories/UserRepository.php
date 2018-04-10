@@ -19,7 +19,21 @@ class UserRepository implements UserRepositoryContract
     public $create_rules = [
         'name' => 'required',
         'email' => 'required|email|unique:users,email',
-        'password'   => 'required'
+        'password'   => 'required',
+        'interested_in_working_with_smi' => 'required|boolean',
+        'interested_in_investing_in_smi' => ' required|boolean',
+        'interested_in_using_smi_for_publicity' => 'required|boolean',
+        'earning_goal_amount' => 'required_if:interested_in_working_with_smi,true',
+        'earning_currency' => 'required_if:interested_in_working_with_smi,true',
+        'earning_frequency' => 'required_if:interested_in_working_with_smi,true',
+        'daily_working_frequency' => 'required_if:interested_in_working_with_smi,true',
+        'possible_investment_amount' => 'required_if:interested_in_investing_in_smi,true',
+        'investment_currency' => 'required_if:interested_in_investing_in_smi,true',
+        'publicity_amount_spent' => 'required_if:interested_in_using_smi_for_publicity,true',
+        'publicity_currency' => 'required_if:interested_in_using_smi_for_publicity,true',
+        'publicity_frequency' => 'required_if:interested_in_using_smi_for_publicity,true',
+        'latitude' => 'required',
+        'longitude' => 'required',
     ];
 
     /**
