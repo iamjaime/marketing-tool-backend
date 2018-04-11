@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Repositories\PaymentRepository as Payment;
 use App\Repositories\UserRepository as User;
 use App\Repositories\OrderRepository as Order;
+use App\Repositories\Withdrawals\Paypal;
+use App\Repositories\Withdrawals\Stripe;
 
 class PaymentController extends Controller
 {
@@ -162,7 +164,48 @@ class PaymentController extends Controller
         ], 200);
     }
 
+    /**
+     * Withdraw funds
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function withdraw(Request $request)
+    {
+        $data = $request->get('data');
 
+        //validate....
+        $rules = $this->payment->create_withdrawal;
+        $validator = $this->validate($request, $rules);
+
+        if(!empty($validator)){
+            return response()->json([
+                'success' => false,
+                'data' => $validator
+            ], 400);
+        }
+
+        switch($data['method']){
+            case 'paypal':
+            $withdrawal = $this->payment->withdraw(new Paypal());
+            break;
+
+            case 'stripe':
+            $withdrawal = $this->payment->withdraw(new Stripe());
+            break;
+
+            default:
+            return response()->json([
+                'success' => false,
+                'data' => ['error' => ['withdrawal' => 'There was an error withdrawing the funds. Please try again later. If the problem persists, please contact support.']]
+            ], 400);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $withdrawal
+        ], 200);
+    }
 
 
 

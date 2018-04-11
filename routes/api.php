@@ -82,6 +82,9 @@ Route::group(['prefix' => 'v1'], function () {
         //Companies Resource
         Route::resource('company', 'CompanyController', ['only' => ['show', 'store', 'update', 'destroy']]);
 
+
+        Route::post('withdraw', 'PaymentController@withdraw');
+
     });
 
 });

@@ -8,6 +8,7 @@ use App\Repositories\UserRepository as User;
 use App\Models\Payment;
 use App\Models\PaymentMethod;
 use Illuminate\Support\Facades\Config;
+use App\Contracts\Repositories\WithdrawFunds;
 
 class PaymentRepository
 {
@@ -34,6 +35,15 @@ class PaymentRepository
     public $create_charge_rules_plan= [
         'views' => 'required',
         'token' => 'required'
+    ];
+
+    /**
+     * Handles the create withdrawal validation rules.
+     * @var array
+     */
+    public $create_withdrawal= [
+        'amount' => 'required',
+        'method' => 'required'
     ];
 
     /**
@@ -309,5 +319,18 @@ class PaymentRepository
         
 
     }
+
+
+    /**
+     * Handles withdrawing funds
+     *
+     * @param WithdrawFunds $withdrawFunds
+     */
+    public function withdraw(WithdrawFunds $withdrawFunds){
+       $withdraw = $withdrawFunds->withdraw();
+       dd($withdraw);
+       return $withdraw;
+    }
+
 
 }
