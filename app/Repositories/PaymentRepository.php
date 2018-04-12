@@ -394,10 +394,9 @@ class PaymentRepository
         $account = $this->merchant->account()->create($data);
 
         if($account['id']){
-            $updateData = [
-                'stripe_customer_id' => $account['id']
-            ];
-            $this->user->update($userId, $updateData);
+            $user = $this->user->find($userId);
+            $user->stripe_account_id = $account['id'];
+            $user->save();
         }
 
         return $account;
