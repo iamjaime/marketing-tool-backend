@@ -29,6 +29,8 @@ Route::group(['prefix' => 'v1'], function () {
 
     Route::post('stripe/webhook', 'PaymentController@webHook');
 
+    Route::post('stripe/recipient', 'PaymentController@stripeRecipient');
+
     Route::post('stripe/credits', 'PaymentController@getCredits');
     Route::post('stripe/cancelSubscription', 'PaymentController@cancelSubscription');
     Route::get('users/sub', 'UserController@sub');
@@ -81,6 +83,9 @@ Route::group(['prefix' => 'v1'], function () {
 
         //Companies Resource
         Route::resource('company', 'CompanyController', ['only' => ['show', 'store', 'update', 'destroy']]);
+
+        //Withdraw funds Resource
+        Route::post('withdraw/stripe', 'PaymentController@withdrawStripe');
 
     });
 

@@ -179,7 +179,8 @@ return [
         SammyK\LaravelFacebookSdk\LaravelFacebookSdkServiceProvider::class,
         Cartalyst\Stripe\Laravel\StripeServiceProvider::class,
         App\Providers\CountryServiceProvider::class,
-        Jenssegers\Agent\AgentServiceProvider::class
+        Jenssegers\Agent\AgentServiceProvider::class,
+        App\Providers\WithdrawalStripeServiceProvider::class
 
     ],
 
@@ -233,6 +234,7 @@ return [
         'Stripe' => Cartalyst\Stripe\Laravel\Facades\Stripe::class,
         'Countries' => Webpatser\Countries\CountriesFacade::class,
         'Agent' => Jenssegers\Agent\Facades\Agent::class,
+        'WithdrawStripe' => App\Providers\WithdrawalStripeServiceProvider::class
 
     ],
 
