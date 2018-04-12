@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Utils\ProcessingFees;
+use Carbon\Carbon;
 use Cartalyst\Stripe\Stripe as Merchant;
 use App\Repositories\UserRepository as User;
 use App\Models\Payment;
@@ -382,13 +383,26 @@ class PaymentRepository
     /**
      * Handles creating a new stripe account for receiver of funds
      *
+     * @param $userId
      * @param $data
      * @return mixed
      */
-    public function createStripeCustomAccount($data)
+    public function createStripeCustomAccount($userId, $data)
     {
+        $data['tos_acceptance']['date'] = strtotime($data['tos_acceptance']['date']);
         $data['type'] = 'custom'; //creates a stripe custom account
         $account = $this->merchant->account()->create($data);
+
+        if($account['id']){
+            $updateData = [
+                'stripe_customer_id' => $account['id']
+            ];
+            $this->user->update($userId, $updateData);
+        }
+
         return $account;
     }
+
+
+
 }

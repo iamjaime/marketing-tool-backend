@@ -165,7 +165,7 @@ class PaymentController extends Controller
             ], 400);
         }
 
-        $account = $this->payment->createStripeCustomAccount($data);
+        $account = $this->payment->createStripeCustomAccount($this->userId(), $data);
 
         return response()->json([
             'success' => true,
