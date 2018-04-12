@@ -44,13 +44,22 @@ class PaymentRepository
      * @var array
      */
     public $create_withdrawal_stripe_recipient= [
-        'name' => 'required',
-        'type' => 'required',
-        'tax_id' => 'required',
-        'bank_account' => 'required',
-        'card' => 'required',
-        'email' => 'required',
-        'description' => 'required',
+        'legal_entity' => 'required',
+        'legal_entity.first_name' => 'required',
+        'legal_entity.ssn_last_4' => 'required',
+        'legal_entity.type' => 'required',
+        'legal_entity.address' => 'required',
+        'legal_entity.address.city' => 'required',
+        'legal_entity.address.line1' => 'required',
+        'legal_entity.address.postal_code' => 'required',
+        'legal_entity.address.state' => 'required',
+        'legal_entity.dob' => 'required',
+        'legal_entity.dob.day' => 'required',
+        'legal_entity.dob.month' => 'required',
+        'legal_entity.dob.year' => 'required',
+        'tos_acceptance' => 'required',
+        'tos_acceptance.date' => 'required',
+        'tos_acceptance.ip' => 'sometimes|required',
     ];
 
 
