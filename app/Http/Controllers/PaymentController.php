@@ -145,6 +145,34 @@ class PaymentController extends Controller
         ], 200);
     }
 
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function stripeRecipient(Request $request)
+    {
+        $data = $request->get('data');
+
+        $rules = $this->payment->create_withdrawal_stripe_recipient;
+        $validator = $this->validate($request, $rules);
+
+        if(!empty($validator)){
+            return response()->json([
+                'success' => false,
+                'data' => $validator
+            ], 400);
+        }
+
+        $account = $this->payment->createStripeCustomAccount($data);
+
+        return response()->json([
+            'success' => true,
+            'data' => $account
+        ], 200);
+    }
+
 
 
      /**
@@ -170,12 +198,12 @@ class PaymentController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function withdraw(Request $request)
+    public function withdrawStripe(Request $request)
     {
         $data = $request->get('data');
 
         //validate....
-        $rules = $this->payment->create_withdrawal;
+        $rules = $this->payment->create_withdrawal_stripe;
         $validator = $this->validate($request, $rules);
 
         if(!empty($validator)){
@@ -185,19 +213,48 @@ class PaymentController extends Controller
             ], 400);
         }
 
-        switch($data['method']){
-            case 'paypal':
-            $withdrawal = $this->payment->withdraw(new Paypal());
-            break;
+        $withdrawal = $this->payment->withdraw($this->userId(), $data, new Stripe());
 
-            case 'stripe':
-            $withdrawal = $this->payment->withdraw(new Stripe());
-            break;
-
-            default:
+        if(!$withdrawal) {
             return response()->json([
                 'success' => false,
-                'data' => ['error' => ['withdrawal' => 'There was an error withdrawing the funds. Please try again later. If the problem persists, please contact support.']]
+                'data' => ['error' => ['withdrawal' => 'there was an error withdrawing your funds. Please try again later, if the problem persists please contact customer support.']]
+            ], 400);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $withdrawal
+        ], 200);
+    }
+
+    /**
+     * Withdraw funds
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function withdrawPaypal(Request $request)
+    {
+        $data = $request->get('data');
+
+        //validate....
+        $rules = $this->payment->create_withdrawal_paypal;
+        $validator = $this->validate($request, $rules);
+
+        if(!empty($validator)){
+            return response()->json([
+                'success' => false,
+                'data' => $validator
+            ], 400);
+        }
+
+        $withdrawal = $this->payment->withdraw($this->userId(), $data, new Paypal());
+
+        if(!$withdrawal) {
+            return response()->json([
+                'success' => false,
+                'data' => ['error' => ['withdrawal' => 'there was an error withdrawing your funds. Please try again later, if the problem persists please contact customer support.']]
             ], 400);
         }
 

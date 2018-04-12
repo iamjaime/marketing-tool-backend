@@ -9,6 +9,8 @@ use App\Models\Payment;
 use App\Models\PaymentMethod;
 use Illuminate\Support\Facades\Config;
 use App\Contracts\Repositories\WithdrawFunds;
+use App\Repositories\Withdrawals\Paypal;
+use App\Repositories\Withdrawals\Stripe;
 
 class PaymentRepository
 {
@@ -38,12 +40,38 @@ class PaymentRepository
     ];
 
     /**
+     * Handles the creating a stripe withdrawal recipient
+     * @var array
+     */
+    public $create_withdrawal_stripe_recipient= [
+        'name' => 'required',
+        'type' => 'required',
+        'tax_id' => 'required',
+        'bank_account' => 'required',
+        'card' => 'required',
+        'email' => 'required',
+        'description' => 'required',
+    ];
+
+
+    /**
      * Handles the create withdrawal validation rules.
      * @var array
      */
-    public $create_withdrawal= [
+    public $create_withdrawal_stripe= [
         'amount' => 'required',
-        'method' => 'required'
+        'currency' => 'required',
+        'recipient' => 'required'
+    ];
+
+    /**
+     * Handles the create withdrawal validation rules.
+     * @var array
+     */
+    public $create_withdrawal_paypal = [
+        'amount' => 'required',
+        'currency' => 'required',
+        'recipient' => 'required'
     ];
 
     /**
@@ -322,15 +350,36 @@ class PaymentRepository
 
 
     /**
-     * Handles withdrawing funds
+     * Handles withdrawing funds with stripe
      *
+     * @param $userId
+     * @param $data
      * @param WithdrawFunds $withdrawFunds
+     * @return mixed
      */
-    public function withdraw(WithdrawFunds $withdrawFunds){
-       $withdraw = $withdrawFunds->withdraw();
-       dd($withdraw);
-       return $withdraw;
+    public function withdrawWithStripe($userId, $data, WithdrawFunds $withdrawFunds){
+
+        $recipient = $withdrawFunds->recipientExists($userId);
+
+        if($recipient){
+            $withdraw = $withdrawFunds->withdraw($data['amount'], $data['currency'], $recipient);
+            return $withdraw;
+        }
+
+        return false;
     }
 
 
+    /**
+     * Handles creating a new stripe account for receiver of funds
+     *
+     * @param $data
+     * @return mixed
+     */
+    public function createStripeCustomAccount($data)
+    {
+        $data['type'] = 'custom'; //creates a stripe custom account
+        $account = $this->merchant->account()->create($data);
+        return $account;
+    }
 }

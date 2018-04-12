@@ -31,6 +31,10 @@ class CreateWithdrawalsTable extends Migration
 
             $table->timestamps();
         });
+
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('stripe_account_id')->after('stripe_customer_id')->nullable();
+        });
     }
 
     /**
@@ -40,6 +44,9 @@ class CreateWithdrawalsTable extends Migration
      */
     public function down()
     {
+        Schema::table('users', function($table) {
+            $table->dropColumn('stripe_account_id');
+        });
         Schema::dropIfExists('withdrawals');
     }
 }
