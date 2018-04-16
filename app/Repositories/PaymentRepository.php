@@ -48,6 +48,7 @@ class PaymentRepository
         'legal_entity' => 'required',
         'legal_entity.first_name' => 'required',
         'legal_entity.ssn_last_4' => 'required',
+        'legal_entity.personal_id_number' => 'required',
         'legal_entity.type' => 'required',
         'legal_entity.address' => 'required',
         'legal_entity.address.city' => 'required',
