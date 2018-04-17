@@ -35,6 +35,23 @@ class CreateWithdrawalsTable extends Migration
         Schema::table('users', function (Blueprint $table) {
             $table->string('stripe_account_id')->after('stripe_customer_id')->nullable();
         });
+
+        Schema::create('stripe_withdrawal_methods', function (Blueprint $table) {
+            $table->increments('id');
+
+            //Foreign Key Referencing the id on the users table.
+            $table->integer('user_id')->unsigned();
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+
+            $table->string('stripe_account_id');
+            $table->string('method_type'); //card, bank_account
+            $table->string('method_id'); //example : card_3920jjfa0fj, bk_3joifjasiof93
+
+            $table->boolean('is_instant_payout_available')->default(false);
+            $table->boolean('is_standard_payout_available')->default(false);
+
+            $table->timestamps();
+        });
     }
 
     /**
@@ -47,6 +64,14 @@ class CreateWithdrawalsTable extends Migration
         Schema::table('users', function($table) {
             $table->dropColumn('stripe_account_id');
         });
+
         Schema::dropIfExists('withdrawals');
+
+
+        Schema::table('stripe_withdrawal_methods', function($table) {
+            $table->dropForeign(['user_id']);
+        });
+
+        Schema::dropIfExists('stripe_withdrawal_methods');
     }
 }

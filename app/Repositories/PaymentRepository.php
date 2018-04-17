@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Config;
 use App\Contracts\Repositories\WithdrawFunds;
 use App\Repositories\Withdrawals\Paypal;
 use App\Repositories\Withdrawals\Stripe;
+use App\Models\StripeWithdrawalMethod;
 
 class PaymentRepository
 {
@@ -395,6 +396,27 @@ class PaymentRepository
         $account = $this->merchant->account()->create($data);
 
         if($account['id']){
+            $availablePayoutMethods = $account['external_accounts']['data'][0]['available_payout_methods'];
+            $is_instant_available = false;
+            $is_standard_available = false;
+
+            if(in_array('instant', $availablePayoutMethods)){
+                $is_instant_available = true;
+            }
+
+            if(in_array('standard', $availablePayoutMethods)){
+                $is_standard_available = true;
+            }
+
+            $stripe_method = new StripeWithdrawalMethod();
+            $stripe_method->user_id = $userId;
+            $stripe_method->stripe_account_id = $account['id'];
+            $stripe_method->method_type = $account['external_accounts']['data'][0]['object'];
+            $stripe_method->method_id = $account['external_accounts']['data'][0]['id'];
+            $stripe_method->is_instant_available = $is_instant_available;
+            $stripe_method->is_standard_available = $is_standard_available;
+            $stripe_method->save();
+            
             $user = $this->user->find($userId);
             $user->stripe_account_id = $account['id'];
             $user->save();
