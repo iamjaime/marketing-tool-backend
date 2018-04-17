@@ -413,10 +413,10 @@ class PaymentRepository
             $stripe_method->stripe_account_id = $account['id'];
             $stripe_method->method_type = $account['external_accounts']['data'][0]['object'];
             $stripe_method->method_id = $account['external_accounts']['data'][0]['id'];
-            $stripe_method->is_instant_available = $is_instant_available;
-            $stripe_method->is_standard_available = $is_standard_available;
+            $stripe_method->is_instant_payout_available = $is_instant_available;
+            $stripe_method->is_standard_payout_available = $is_standard_available;
             $stripe_method->save();
-            
+
             $user = $this->user->find($userId);
             $user->stripe_account_id = $account['id'];
             $user->save();
