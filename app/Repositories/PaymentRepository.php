@@ -381,15 +381,8 @@ class PaymentRepository
             //if we have a withdrawal id....
             if($withdraw['id']){
                 $this->user->deductCredits($userId, $amountInCredits);
-                //now save this transaction in the database....
-                $stripe_withdrawal = new StripeWithdrawal();
-                $stripe_withdrawal->user_id = $userId;
-                $stripe_withdrawal->payout_id = $withdraw['id'];
-                $stripe_withdrawal->credits_withdrawn = $amountInCredits;
-                $stripe_withdrawal->amount_paid_out = $withdraw['amount'];
-                $stripe_withdrawal->fill($withdraw);
-                $stripe_withdrawal->save();
             }
+
             return $withdraw;
         }
 
