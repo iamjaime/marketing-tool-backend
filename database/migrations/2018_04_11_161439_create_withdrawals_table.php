@@ -34,7 +34,7 @@ class CreateWithdrawalsTable extends Migration
 
             $table->string('currency');
 
-            $table->string('description');
+            $table->string('description')->nullable();
 
             $table->string('destination');
 
