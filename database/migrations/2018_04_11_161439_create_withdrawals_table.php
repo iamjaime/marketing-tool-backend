@@ -13,21 +13,43 @@ class CreateWithdrawalsTable extends Migration
      */
     public function up()
     {
-        Schema::create('withdrawals', function (Blueprint $table) {
+        Schema::create('stripe_withdrawals', function (Blueprint $table) {
             $table->increments('id');
 
             //Foreign Key Referencing the id on the users table.
             $table->integer('user_id')->unsigned();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
 
+            $table->string('payout_id'); //payout id
+
             $table->integer('credits_withdrawn');
+
             $table->integer('amount_paid_out'); //in pennies
 
-            $table->integer('transaction_fee'); //in pennies
+            $table->dateTime('arrival_date'); //date the funds are scheduled to arrive
 
-            $table->string('method'); //stripe, paypal, smi
+            $table->boolean('automatic');
+
+            $table->string('balance_transaction');
+
+            $table->string('currency');
+
+            $table->string('description');
+
+            $table->string('destination');
+
+            $table->string('failure_balance_transaction')->nullable();
+            $table->string('failure_code')->nullable();
+            $table->string('failure_message')->nullable();
+            $table->boolean('live_mode')->nullable();
+
+            $table->string('method'); //standard, instant
+
+            $table->string('source_type');
+            $table->string('statement_descriptor')->nullable();
 
             $table->string('status');
+            $table->string('type'); //bank account or card
 
             $table->timestamps();
         });
@@ -65,7 +87,7 @@ class CreateWithdrawalsTable extends Migration
             $table->dropColumn('stripe_account_id');
         });
 
-        Schema::dropIfExists('withdrawals');
+        Schema::dropIfExists('stripe_withdrawals');
 
 
         Schema::table('stripe_withdrawal_methods', function($table) {

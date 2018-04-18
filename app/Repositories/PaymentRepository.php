@@ -10,9 +10,8 @@ use App\Models\Payment;
 use App\Models\PaymentMethod;
 use Illuminate\Support\Facades\Config;
 use App\Contracts\Repositories\WithdrawFunds;
-use App\Repositories\Withdrawals\Paypal;
-use App\Repositories\Withdrawals\Stripe;
 use App\Models\StripeWithdrawalMethod;
+use App\Models\StripeWithdrawal;
 
 class PaymentRepository
 {
@@ -374,12 +373,33 @@ class PaymentRepository
         $recipient = $withdrawFunds->recipientExists($userId);
 
         if($recipient){
-            $withdraw = $withdrawFunds->withdraw($data['amount'], $data['currency'], $recipient);
-            return $withdraw;
+            //check if user has sufficient funds....
+            $amountPerCredit = config('marketingtool.net_worth');
+            $amountInCredits = ($data['amount'] * ($amountPerCredit * 100)); //in pennies
+
+            if($this->user->hasEnoughCredits($userId, $amountInCredits)){
+                $withdraw = $withdrawFunds->withdraw($data['amount'], $data['currency'], $recipient);
+                if($withdraw['status'] == 'paid'){
+                    $this->user->deductCredits($userId, $amountInCredits);
+                    //now save this transaction in the database....
+                    $stripe_withdrawal = new StripeWithdrawal();
+                    $stripe_withdrawal->user_id = $userId;
+                    $stripe_withdrawal->payout_id = $withdraw['id'];
+                    $stripe_withdrawal->credits_withdrawn = $amountInCredits;
+                    $stripe_withdrawal->amount_paid_out = $withdraw['amount'];
+                    $stripe_withdrawal->fill($withdraw);
+                    $stripe_withdrawal->save();
+                }
+                return $withdraw;
+            }else{
+                return false;
+            }
         }
 
         return false;
     }
+
+
 
 
     /**
