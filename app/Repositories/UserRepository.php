@@ -64,7 +64,7 @@ class UserRepository implements UserRepositoryContract
      */
     public function find($id)
     {
-        $user = $this->user->where('id', $id)->with(['primaryLanguage', 'attachedNetworks.provider', 'paymentMethods'])->first();
+        $user = $this->user->where('id', $id)->with(['primaryLanguage', 'attachedNetworks.provider', 'paymentMethods','stripeWithdrawal'])->first();
         return $user;
     }
 
