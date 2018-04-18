@@ -117,4 +117,13 @@ class User extends Authenticatable
     {
         return $this->hasMany('App\Models\Payment', 'user_id');
     }
+
+
+
+     
+    public function stripeWithdrawal()
+    {
+        return $this->hasMany('App\Models\StripeWithdrawalMethod', 'user_id');
+    }
+ 
 }
