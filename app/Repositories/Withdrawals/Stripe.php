@@ -5,6 +5,7 @@ namespace App\Repositories\Withdrawals;
 use App\Contracts\Repositories\WithdrawFunds;
 use Cartalyst\Stripe\Stripe as Merchant;
 use App\Models\User;
+use App\Models\StripeWithdrawalMethod;
 
 use Illuminate\Support\Facades\Config;
 
@@ -30,15 +31,19 @@ class Stripe implements WithdrawFunds
 
     public function withdraw($amount, $currency, $recipient)
     {
-        $payoutData = array(
-            'amount' => $amount,
-            'currency' => $currency,
-            'method' => 'instant'
-        );
+        $amount = $amount / 100; //take the pennies and convert them to dollars.....
+        $stripeWithdrawalMethods = StripeWithdrawalMethod::where('stripe_account_id', '=', $recipient)->first();
+        $payoutType = 'standard';
+        if($stripeWithdrawalMethods->is_instant_payout_available){
+            $payoutType = 'instant';
+        }
 
-        $data = array($payoutData, array("stripe_account" => $recipient));
-
-        $this->merchant->payouts()->create($data);
+        $this->merchant->payouts()->create(array(
+            "amount" => $amount,
+            "currency" => $currency,
+            "method" => $payoutType
+        ),
+            array("stripe_account" => $recipient));
     }
 
 

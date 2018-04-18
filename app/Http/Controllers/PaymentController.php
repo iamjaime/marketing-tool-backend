@@ -213,7 +213,7 @@ class PaymentController extends Controller
             ], 400);
         }
 
-        $withdrawal = $this->payment->withdraw($this->userId(), $data, new Stripe());
+        $withdrawal = $this->payment->withdrawWithStripe($this->userId(), $data, new Stripe());
 
         if(!$withdrawal) {
             return response()->json([
