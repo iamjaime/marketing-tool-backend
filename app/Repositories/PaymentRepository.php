@@ -71,8 +71,7 @@ class PaymentRepository
      */
     public $create_withdrawal_stripe= [
         'amount' => 'required',
-        'currency' => 'required',
-        'recipient' => 'required'
+        'currency' => 'required'
     ];
 
     /**
@@ -373,27 +372,24 @@ class PaymentRepository
         $recipient = $withdrawFunds->recipientExists($userId);
 
         if($recipient){
-            //check if user has sufficient funds....
+
             $amountPerCredit = config('marketingtool.net_worth');
             $amountInCredits = ($data['amount'] * ($amountPerCredit * 100)); //in pennies
 
-            if($this->user->hasEnoughCredits($userId, $amountInCredits)){
-                $withdraw = $withdrawFunds->withdraw($data['amount'], $data['currency'], $recipient);
-                if($withdraw['status'] == 'paid'){
-                    $this->user->deductCredits($userId, $amountInCredits);
-                    //now save this transaction in the database....
-                    $stripe_withdrawal = new StripeWithdrawal();
-                    $stripe_withdrawal->user_id = $userId;
-                    $stripe_withdrawal->payout_id = $withdraw['id'];
-                    $stripe_withdrawal->credits_withdrawn = $amountInCredits;
-                    $stripe_withdrawal->amount_paid_out = $withdraw['amount'];
-                    $stripe_withdrawal->fill($withdraw);
-                    $stripe_withdrawal->save();
-                }
-                return $withdraw;
-            }else{
-                return false;
+            $withdraw = $withdrawFunds->withdraw($data['amount'], $data['currency'], $recipient);
+
+            if($withdraw['status'] == 'paid'){
+                $this->user->deductCredits($userId, $amountInCredits);
+                //now save this transaction in the database....
+                $stripe_withdrawal = new StripeWithdrawal();
+                $stripe_withdrawal->user_id = $userId;
+                $stripe_withdrawal->payout_id = $withdraw['id'];
+                $stripe_withdrawal->credits_withdrawn = $amountInCredits;
+                $stripe_withdrawal->amount_paid_out = $withdraw['amount'];
+                $stripe_withdrawal->fill($withdraw);
+                $stripe_withdrawal->save();
             }
+            return $withdraw;
         }
 
         return false;

@@ -213,6 +213,19 @@ class PaymentController extends Controller
             ], 400);
         }
 
+
+        //check if user has sufficient funds....
+        $amountPerCredit = config('marketingtool.net_worth');
+        $amountInCredits = ($data['amount'] * ($amountPerCredit * 100)); //in pennies
+
+        if(!$this->user->hasEnoughCredits($this->userId(), $amountInCredits)){
+            return response()->json([
+                'success' => false,
+                'data' => ['error' => ['withdrawal' => 'You do not have enough credits to withdraw this amount.']]
+            ], 400);
+        }
+
+
         $withdrawal = $this->payment->withdrawWithStripe($this->userId(), $data, new Stripe());
 
         if(!$withdrawal) {
