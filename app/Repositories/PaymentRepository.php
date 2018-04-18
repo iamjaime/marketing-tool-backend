@@ -433,6 +433,13 @@ class PaymentRepository
             $stripe_method->stripe_account_id = $account['id'];
             $stripe_method->method_type = $account['external_accounts']['data'][0]['object'];
             $stripe_method->method_id = $account['external_accounts']['data'][0]['id'];
+            $stripe_method->brand = $account['external_accounts']['data'][0]['brand'];
+            $stripe_method->country = $account['external_accounts']['data'][0]['country'];
+            $stripe_method->currency = $account['external_accounts']['data'][0]['currency'];
+            $stripe_method->last4 = $account['external_accounts']['data'][0]['last4'];
+            $stripe_method->cvc_check = $account['external_accounts']['data'][0]['cvc_check'];
+            $stripe_method->exp_month = $account['external_accounts']['data'][0]['exp_month'];
+            $stripe_method->exp_year = $account['external_accounts']['data'][0]['exp_year'];
             $stripe_method->is_instant_payout_available = $is_instant_available;
             $stripe_method->is_standard_payout_available = $is_standard_available;
             $stripe_method->save();

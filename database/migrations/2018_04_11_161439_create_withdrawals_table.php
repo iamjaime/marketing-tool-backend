@@ -68,6 +68,14 @@ class CreateWithdrawalsTable extends Migration
             $table->string('stripe_account_id');
             $table->string('method_type'); //card, bank_account
             $table->string('method_id'); //example : card_3920jjfa0fj, bk_3joifjasiof93
+            $table->string('brand')->nullable(); //example : Master Card / Visa etc.
+            $table->string('country');
+            $table->string('currency');
+            $table->string('last4');
+            $table->string('cvc_check')->nullable();
+            $table->string('exp_month')->nullable();
+            $table->string('exp_year')->nullable();
+
 
             $table->boolean('is_instant_payout_available')->default(false);
             $table->boolean('is_standard_payout_available')->default(false);
