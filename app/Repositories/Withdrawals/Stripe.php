@@ -3,11 +3,12 @@
 namespace App\Repositories\Withdrawals;
 
 use App\Contracts\Repositories\WithdrawFunds;
-use Cartalyst\Stripe\Stripe as Merchant;
+use App\Utils\Stripe\StripePackage as Merchant;
 use App\Models\User;
 use App\Models\StripeWithdrawalMethod;
 
 use Illuminate\Support\Facades\Config;
+
 
 /**
  * Class Stripe
@@ -94,12 +95,14 @@ class Stripe implements WithdrawFunds
             $payoutType = 'instant';
         }
 
+        //Set the Stripe Header Account Id....
+        $this->merchant->payouts()->config->setAccountId($recipient);
+
         return $this->merchant->payouts()->create(array(
             "amount" => $amount,
             "currency" => $currency,
             "method" => $payoutType
-        ),
-            array("stripe_account" => $recipient));
+        ));
     }
 
 }

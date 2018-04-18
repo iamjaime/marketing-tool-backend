@@ -177,7 +177,10 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         SammyK\LaravelFacebookSdk\LaravelFacebookSdkServiceProvider::class,
-        Cartalyst\Stripe\Laravel\StripeServiceProvider::class,
+
+        //Cartalyst\Stripe\Laravel\StripeServiceProvider::class,
+        App\Providers\StripeServiceProvider::class,
+
         App\Providers\CountryServiceProvider::class,
         Jenssegers\Agent\AgentServiceProvider::class,
         App\Providers\WithdrawalStripeServiceProvider::class
