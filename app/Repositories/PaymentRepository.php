@@ -378,7 +378,8 @@ class PaymentRepository
 
             $withdraw = $withdrawFunds->withdraw($data['amount'], $data['currency'], $recipient);
 
-            if($withdraw['status'] == 'paid'){
+            //if we have a withdrawal id....
+            if($withdraw['id']){
                 $this->user->deductCredits($userId, $amountInCredits);
                 //now save this transaction in the database....
                 $stripe_withdrawal = new StripeWithdrawal();
