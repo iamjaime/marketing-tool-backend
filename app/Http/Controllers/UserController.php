@@ -201,7 +201,7 @@ class UserController extends Controller
     }
 
 
-/**
+    /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
@@ -209,6 +209,20 @@ class UserController extends Controller
     public function sub()
     {
         $user = $this->user->sub($this->userId());
+        return response()->json([
+            'success' => true,
+            'data' => $user
+        ], 200);
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getStripe_withdrawals()
+    {
+        $user = $this->user->getStripe_withdrawals($this->userId());
         return response()->json([
             'success' => true,
             'data' => $user

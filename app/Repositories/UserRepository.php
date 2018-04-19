@@ -214,5 +214,16 @@ class UserRepository implements UserRepositoryContract
     }
 
 
-      
+     /**
+     * Handles Finding a user by id
+     *
+     * @param int $id
+     * @return mixed
+     */
+    public function getStripe_withdrawals($id)
+    {
+        $user = $this->user->where('id', $id)->with(['stripeWithdrawals'])->first();
+        return $user;
+    }
+    
 }
