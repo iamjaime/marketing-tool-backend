@@ -21,4 +21,13 @@ interface WithdrawFunds
      */
     public function recipientExists($userId);
 
+    /**
+     * Handles updating the payout record from the webhook
+     *
+     * @param $payoutId
+     * @param $data
+     * @return mixed
+     */
+    public function updatePayoutRecord($payoutId, $data);
+
 }

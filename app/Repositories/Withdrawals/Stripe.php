@@ -134,4 +134,24 @@ class Stripe implements WithdrawFunds
     }
 
 
+    /**
+     * Handles updating the payout record from the webhook
+     *
+     * @param $payoutId
+     * @param $data
+     * @return mixed
+     */
+    public function updatePayoutRecord($payoutId, $data)
+    {
+        $withdrawal = StripeWithdrawal::where('id', '=', $payoutId)->first();
+        //Failure.....
+        $withdrawal->failure_balance_transaction = $data['failure_balance_transaction'];
+        $withdrawal->failure_code = $data['failure_code'];
+        $withdrawal->failure_message = $data['failure_message'];
+        $withdrawal->status = $data['status'];
+        $withdrawal->save();
+
+        return $withdrawal;
+    }
+
 }

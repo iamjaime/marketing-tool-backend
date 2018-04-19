@@ -88,8 +88,16 @@ class PaymentRepository
      * Handles the webhook validation rules.
      * @var array
      */
-    public $webhook_rules = [
+    public $stripe_customer_webhook_rules = [
         'object.customer' => 'required|exists:users,stripe_customer_id',
+    ];
+
+    /**
+     * Handles the webhook validation rules.
+     * @var array
+     */
+    public $stripe_withdrawal_webhook_rules = [
+        'object.id' => 'required|exists:stripe_withdrawals,payout_id',
     ];
 
     /**
@@ -387,6 +395,19 @@ class PaymentRepository
         }
 
         return false;
+    }
+
+
+    /**
+     * Handles updating the withdrawn funds record.
+     *
+     * @param $data
+     * @param WithdrawFunds $withdrawFunds
+     * @return mixed
+     */
+    public function updateStripePayoutRecord($data, WithdrawFunds $withdrawFunds)
+    {
+        return $payoutRecord = $withdrawFunds->updatePayoutRecord($data['id'], $data);
     }
 
 

@@ -120,14 +120,14 @@ class PaymentController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function webHook(Request $request)
+    public function stripeCustomerWebHook(Request $request)
     {
         $data = $request->get('data'); 
         $eventType = $request->get('type'); 
          
 
         //validate that our customer exists in the db....
-         $rules = $this->payment->webhook_rules;
+         $rules = $this->payment->stripe_customer_webhook_rules;
          $validator = $this->validate($request, $rules);
 
          if(!empty($validator)){
@@ -142,6 +142,39 @@ class PaymentController extends Controller
         return response()->json([
             'success' => true,
             'data' => $fees
+        ], 200);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function stripeWithdrawalWebHook(Request $request)
+    {
+        $data = $request->get('data');
+        $eventType = $request->get('type');
+
+
+        //validate that our customer exists in the db....
+        $rules = $this->payment->stripe_withdrawal_webhook_rules;
+        $validator = $this->validate($request, $rules);
+
+        if(!empty($validator)){
+            return response()->json([
+                'success' => false,
+                'data' => $validator
+            ], 400);
+        }
+
+        //lets update the payout record....
+        $payout = $this->payment->updateStripePayoutRecord($data['object'], new Stripe());
+
+
+        return response()->json([
+            'success' => true,
+            'data' => $payout
         ], 200);
     }
 
