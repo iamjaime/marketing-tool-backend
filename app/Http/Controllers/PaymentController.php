@@ -156,7 +156,6 @@ class PaymentController extends Controller
         $data = $request->get('data');
         $eventType = $request->get('type');
 
-
         //validate that our customer exists in the db....
         $rules = $this->payment->stripe_withdrawal_webhook_rules;
         $validator = $this->validate($request, $rules);

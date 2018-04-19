@@ -143,7 +143,8 @@ class Stripe implements WithdrawFunds
      */
     public function updatePayoutRecord($payoutId, $data)
     {
-        $withdrawal = StripeWithdrawal::where('id', '=', $payoutId)->first();
+        $withdrawal = StripeWithdrawal::where('payout_id', '=', $payoutId)->first();
+
         //Failure.....
         $withdrawal->failure_balance_transaction = $data['failure_balance_transaction'];
         $withdrawal->failure_code = $data['failure_code'];
