@@ -148,6 +148,8 @@ class Stripe implements WithdrawFunds
         $withdrawal->failure_balance_transaction = $data['failure_balance_transaction'];
         $withdrawal->failure_code = $data['failure_code'];
         $withdrawal->failure_message = $data['failure_message'];
+
+        $withdrawal->arrival_date = Carbon::createFromTimestamp($data['arrival_date'])->format('Y-m-d H:i:s');
         $withdrawal->status = $data['status'];
         $withdrawal->save();
 
