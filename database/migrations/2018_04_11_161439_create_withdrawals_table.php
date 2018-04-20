@@ -13,6 +13,36 @@ class CreateWithdrawalsTable extends Migration
      */
     public function up()
     {
+
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('stripe_account_id')->after('stripe_customer_id')->nullable();
+        });
+
+        Schema::create('stripe_withdrawal_methods', function (Blueprint $table) {
+            $table->increments('id');
+
+            //Foreign Key Referencing the id on the users table.
+            $table->integer('user_id')->unsigned();
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+
+            $table->string('stripe_account_id');
+            $table->string('method_type'); //card, bank_account
+            $table->string('method_id')->index(); //example : card_3920jjfa0fj, bk_3joifjasiof93
+            $table->string('brand')->nullable(); //example : Master Card / Visa etc.
+            $table->string('country');
+            $table->string('currency');
+            $table->string('last4');
+            $table->string('cvc_check')->nullable();
+            $table->string('exp_month')->nullable();
+            $table->string('exp_year')->nullable();
+
+
+            $table->boolean('is_instant_payout_available')->default(false);
+            $table->boolean('is_standard_payout_available')->default(false);
+
+            $table->timestamps();
+        });
+
         Schema::create('stripe_withdrawals', function (Blueprint $table) {
             $table->increments('id');
 
@@ -36,7 +66,9 @@ class CreateWithdrawalsTable extends Migration
 
             $table->string('description')->nullable();
 
+            //Foreign Key Referencing the card on the withdrawal methods table
             $table->string('destination');
+            $table->foreign('destination')->references('method_id')->on('stripe_withdrawal_methods')->onDelete('cascade');
 
             $table->string('failure_balance_transaction')->nullable();
             $table->string('failure_code')->nullable();
@@ -50,35 +82,6 @@ class CreateWithdrawalsTable extends Migration
 
             $table->string('status');
             $table->string('type'); //bank account or card
-
-            $table->timestamps();
-        });
-
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('stripe_account_id')->after('stripe_customer_id')->nullable();
-        });
-
-        Schema::create('stripe_withdrawal_methods', function (Blueprint $table) {
-            $table->increments('id');
-
-            //Foreign Key Referencing the id on the users table.
-            $table->integer('user_id')->unsigned();
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-
-            $table->string('stripe_account_id');
-            $table->string('method_type'); //card, bank_account
-            $table->string('method_id'); //example : card_3920jjfa0fj, bk_3joifjasiof93
-            $table->string('brand')->nullable(); //example : Master Card / Visa etc.
-            $table->string('country');
-            $table->string('currency');
-            $table->string('last4');
-            $table->string('cvc_check')->nullable();
-            $table->string('exp_month')->nullable();
-            $table->string('exp_year')->nullable();
-
-
-            $table->boolean('is_instant_payout_available')->default(false);
-            $table->boolean('is_standard_payout_available')->default(false);
 
             $table->timestamps();
         });

@@ -34,8 +34,9 @@ Route::group(['prefix' => 'v1'], function () {
 
     Route::post('stripe/credits', 'PaymentController@getCredits');
     Route::post('stripe/cancelSubscription', 'PaymentController@cancelSubscription');
-    Route::get('users/sub', 'UserController@sub');
-    Route::get('users/getStripe_withdrawals', 'UserController@getStripe_withdrawals');
+
+    Route::get('users/subscriptions', 'UserController@subscriptions');
+    Route::get('users/stripe/withdrawals', 'UserController@getStripeWithdrawals');
 
     //Stats
     Route::get('smi-stats', 'StatController@index');

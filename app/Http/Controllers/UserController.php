@@ -206,9 +206,9 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function sub()
+    public function subscriptions()
     {
-        $user = $this->user->sub($this->userId());
+        $user = $this->user->subscriptions($this->userId());
         return response()->json([
             'success' => true,
             'data' => $user
@@ -220,9 +220,12 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function getStripe_withdrawals()
+    public function getStripeWithdrawals()
     {
-        $user = $this->user->getStripe_withdrawals($this->userId());
+        $perPage = 10;
+
+        $user = $this->user->getStripeWithdrawals($this->userId())->paginate($perPage);
+
         return response()->json([
             'success' => true,
             'data' => $user

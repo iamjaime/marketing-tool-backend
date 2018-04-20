@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Contracts\Repositories\UserRepository as UserRepositoryContract;
 use App\Models\User;
+use App\Models\StripeWithdrawal;
 use Carbon\Carbon;
 
 
@@ -64,7 +65,7 @@ class UserRepository implements UserRepositoryContract
      */
     public function find($id)
     {
-        $user = $this->user->where('id', $id)->with(['primaryLanguage', 'attachedNetworks.provider', 'paymentMethods','stripeWithdrawal'])->first();
+        $user = $this->user->where('id', $id)->with(['primaryLanguage', 'attachedNetworks.provider', 'paymentMethods'])->first();
         return $user;
     }
 
@@ -207,23 +208,23 @@ class UserRepository implements UserRepositoryContract
      * @param int $id
      * @return mixed
      */
-    public function sub($id)
+    public function subscriptions($id)
     {
-        $user = $this->user->where('id', $id)->with(['sub'])->first();
+        $user = $this->user->where('id', $id)->with(['subscriptions'])->first();
         return $user;
     }
 
 
      /**
-     * Handles Finding a user by id
+     * Handles getting the stripe withdrawals for this user.
      *
      * @param int $id
      * @return mixed
      */
-    public function getStripe_withdrawals($id)
+    public function getStripeWithdrawals($id)
     {
-        $user = $this->user->where('id', $id)->with(['stripeWithdrawals'])->first();
-        return $user;
+        $withdrawals = StripeWithdrawal::where('user_id', '=', $id)->with('payoutMethod');
+        return $withdrawals;
     }
     
 }

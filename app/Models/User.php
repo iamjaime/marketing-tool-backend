@@ -109,24 +109,30 @@ class User extends Authenticatable
 
 
     /**
-     * Handles getting the logged in user's attached social media networks
+     * Handles getting the user's subscriptions
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function sub()
+    public function subscriptions()
     {
         return $this->hasMany('App\Models\Payment', 'user_id');
     }
 
-
-
-     
-    public function stripeWithdrawal()
+    /**
+     * Handles getting the User's Stripe withdrawal methods
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function stripeWithdrawalMethods()
     {
         return $this->hasMany('App\Models\StripeWithdrawalMethod', 'user_id');
     }
- 
 
+    /**
+     * Handles getting the user's withdrawal history
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function stripeWithdrawals()
     {
         return $this->hasMany('App\Models\StripeWithdrawal', 'user_id');

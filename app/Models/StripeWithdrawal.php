@@ -31,4 +31,14 @@ class StripeWithdrawal extends Model
         'status',
         'type',
     ];
+
+    /**
+     * Handles returning the payout method attached to this withdrawal record
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function payoutMethod()
+    {
+        return $this->hasOne('App\Models\StripeWithdrawalMethod', 'method_id', 'destination');
+    }
 }

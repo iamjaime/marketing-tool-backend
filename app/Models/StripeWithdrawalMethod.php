@@ -25,4 +25,5 @@ class StripeWithdrawalMethod extends Model
         'is_instant_payout_available',
         'is_standard_payout_available',
     ];
+
 }
