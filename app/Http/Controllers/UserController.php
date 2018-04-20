@@ -224,7 +224,7 @@ class UserController extends Controller
     {
         $perPage = 10;
 
-        $user = $this->user->getStripeWithdrawals($this->userId())->paginate($perPage);
+        $user = $this->user->getStripeWithdrawals($this->userId())->orderBy('id', 'DESC')->paginate($perPage);
 
         return response()->json([
             'success' => true,
