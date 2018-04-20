@@ -220,9 +220,13 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function getStripeWithdrawals()
+    public function getStripeWithdrawals(Request $request)
     {
-        $perPage = 10;
+        $perPage = $request->get('per_page');
+
+        if(!$perPage){
+            $perPage = 10;
+        }
 
         $user = $this->user->getStripeWithdrawals($this->userId())->orderBy('id', 'DESC')->paginate($perPage);
 
