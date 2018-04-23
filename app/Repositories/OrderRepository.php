@@ -132,8 +132,9 @@ class OrderRepository implements OrderRepositoryContract
                 'orders.service',
                 'orders.buyer'
             ])->get();
-
-        return $orders;
+        
+           
+        return  $orders  ;
     }
 
     /**

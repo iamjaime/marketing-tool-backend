@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Contracts\Repositories\UserRepository as UserRepositoryContract;
 use App\Models\User;
+use App\Models\Payment;
 use App\Models\StripeWithdrawal;
 use Carbon\Carbon;
 
@@ -12,6 +13,7 @@ class UserRepository implements UserRepositoryContract
 {
 
     protected $user;
+    protected $payment;
 
     /**
      * Handles the create new user validation rules.
@@ -53,8 +55,9 @@ class UserRepository implements UserRepositoryContract
     ];
 
 
-    public function __construct(User $user){
+    public function __construct(User $user, Payment $payment){
         $this->user = $user;
+        $this->payment = $payment;
     }
 
     /**
@@ -210,7 +213,7 @@ class UserRepository implements UserRepositoryContract
      */
     public function subscriptions($id)
     {
-        $user = $this->user->where('id', $id)->with(['subscriptions'])->first();
+        $user = $this->payment->where('user_id', $id) ;
         return $user;
     }
 

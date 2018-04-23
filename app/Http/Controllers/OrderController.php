@@ -66,10 +66,12 @@ class OrderController extends Controller
      */
     public function ownedOrders($providerId)
     {
-        $order = $this->order->findAllByProviderIdAndBuyerId($providerId, $this->userId(), false);
+        $perPage = 10;
+        $user = $this->order->findAllByProviderIdAndBuyerId ($providerId, $this->userId(),false) ;
+       
         return response()->json([
             'success' => true,
-            'data' => $order
+            'data' => $user
         ], 200);
     }
 

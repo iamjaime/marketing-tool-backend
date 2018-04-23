@@ -208,7 +208,8 @@ class UserController extends Controller
      */
     public function subscriptions()
     {
-        $user = $this->user->subscriptions($this->userId());
+        $perPage = 10;
+        $user = $this->user->subscriptions($this->userId())->orderBy('id', 'DESC')->paginate($perPage);
         return response()->json([
             'success' => true,
             'data' => $user
