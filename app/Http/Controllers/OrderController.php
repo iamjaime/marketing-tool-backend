@@ -28,7 +28,9 @@ class OrderController extends Controller
      */
     public function providerOrders($providerId)
     {
-        $order = $this->order->findAllByProviderId($providerId, false);
+
+        $per_page = 10; 
+        $order = $this->order->findAllByProviderId($providerId, false)->paginate($per_page);
         return response()->json([
             'success' => true,
             'data' => $order

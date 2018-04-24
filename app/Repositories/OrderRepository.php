@@ -109,7 +109,12 @@ class OrderRepository implements OrderRepositoryContract
                 'orders.service',
                 'orders.buyer'
             ])->get();
-
+            $orders = $this->order->where('is_complete', '=', $isCompleted)
+            ->leftJoin('service_providers as sp', 'orders.service_provider_id', '=', 'sp.id')
+            ->where('orders.service_provider_id', '=', $providerId)
+            ->with(['service'])
+            ->select(['orders.*', 'sp.name as provider']);
+            
         return $orders;
     }
 
