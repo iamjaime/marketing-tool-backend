@@ -124,17 +124,23 @@ class OrderRepository implements OrderRepositoryContract
      */
     public function findAllByProviderIdAndBuyerId($providerId, $buyerId, $isCompleted=false)
     {
-        $orders = $this->serviceProvider->where('id', '=', $providerId)
-            ->with(['orders' => function($q) use ($isCompleted, $buyerId){
-            $q->where('is_complete', '=', $isCompleted)->where('user_id', '=', $buyerId);
-        },
-                'orders.usersProvidingService',
-                'orders.service',
-                'orders.buyer'
-            ])->get();
-        
-           
-        return  $orders  ;
+//        $orders = $this->serviceProvider->where('id', '=', $providerId)
+//            ->with(['orders' => function($q) use ($isCompleted, $buyerId){
+//            $q->where('is_complete', '=', $isCompleted)->where('user_id', '=', $buyerId);
+//        },
+//                'orders.usersProvidingService',
+//                'orders.service',
+//                'orders.buyer'
+//            ])->get();
+
+
+        $orders = $this->order->where('is_complete', '=', $isCompleted)->where('user_id', '=', $buyerId)
+            ->leftJoin('service_providers as sp', 'orders.service_provider_id', '=', 'sp.id')
+            ->where('orders.service_provider_id', '=', $providerId)
+            ->with(['service'])
+            ->select(['orders.*', 'sp.name as provider']);
+
+        return  $orders;
     }
 
     /**

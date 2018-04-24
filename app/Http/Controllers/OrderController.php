@@ -64,10 +64,13 @@ class OrderController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function ownedOrders($providerId)
+    public function ownedOrders(Request $request, $providerId)
     {
-        $perPage = 10;
-        $user = $this->order->findAllByProviderIdAndBuyerId ($providerId, $this->userId(),false) ;
+        $per_page = $request->get('per_page');
+
+        if(!$per_page){ $per_page = 10; }
+
+        $user = $this->order->findAllByProviderIdAndBuyerId ($providerId, $this->userId(),false)->paginate($per_page);
        
         return response()->json([
             'success' => true,
