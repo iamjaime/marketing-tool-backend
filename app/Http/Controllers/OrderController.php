@@ -9,6 +9,9 @@ use App\Repositories\UserRepository as User;
 use Illuminate\Support\Facades\Config;
 use Jenssegers\Agent\Agent;
 
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Contracts\Filesystem\Filesystem;
+
 class OrderController extends Controller
 {
     protected $order;
@@ -101,6 +104,12 @@ class OrderController extends Controller
     {
         $data = $request->get('data');
 
+        if($request->hasFile('image')){
+            $image = $request->file('image');
+            $imageFileName = time() . '.' . $image->getClientOriginalExtension();
+        }
+
+
         //validate....
         $rules = $this->order->create_rules;
         $validator = $this->validate($request, $rules);
@@ -121,6 +130,14 @@ class OrderController extends Controller
                 ]
             ], 400);
         }
+
+        //Lets upload the image file to our s3 bucket
+        $s3 = Storage::disk('s3');
+        $filePath = '/order_images/' . $imageFileName;
+        $s3->put($filePath, file_get_contents($image), 'public');
+
+        $data['image_url'] = $filePath;
+
 
         //If we pass validation lets create user and output success :)
         if($data['automatic']){

@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\UserProvidingService;
 use App\Repositories\AutomaticJobRepository;
 
+
 class OrderRepository implements OrderRepositoryContract
 {
 
