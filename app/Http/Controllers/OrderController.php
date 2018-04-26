@@ -131,13 +131,15 @@ class OrderController extends Controller
             ], 400);
         }
 
-        //Lets upload the image file to our s3 bucket
-        $s3 = Storage::disk('s3');
-        $filePath = '/order_images/' . $imageFileName;
-        $s3->put($filePath, file_get_contents($image), 'public');
 
-        $data['image_url'] = $filePath;
+        if($request->hasFile('image')) {
+            //Lets upload the image file to our s3 bucket
+            $s3 = Storage::disk('s3');
+            $filePath = '/order_images/' . $imageFileName;
+            $s3->put($filePath, file_get_contents($image), 'public');
 
+            $data['image_url'] = $filePath;
+        }
 
         //If we pass validation lets create user and output success :)
         if($data['automatic']){
